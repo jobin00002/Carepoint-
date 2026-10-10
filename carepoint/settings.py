@@ -85,13 +85,19 @@ IS_SERVERLESS = bool(os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNC
 
 if IS_SERVERLESS:
     tmp_db_path = Path('/tmp/db.sqlite3')
-    orig_db_path = BASE_DIR / 'db.sqlite3'
-    if orig_db_path.exists() and (not tmp_db_path.exists() or tmp_db_path.stat().st_size == 0):
-        try:
-            shutil.copyfile(orig_db_path, tmp_db_path)
-            os.chmod(tmp_db_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
-        except Exception as e:
-            print(f"Warning copying DB to /tmp: {e}")
+    candidate_sources = [
+        BASE_DIR / 'db.sqlite3',
+        Path('/var/task/db.sqlite3'),
+        Path(__file__).resolve().parent.parent / 'db.sqlite3',
+    ]
+    source_db = next((p for p in candidate_sources if p.exists() and p.stat().st_size > 0), None)
+    if source_db:
+        if not tmp_db_path.exists() or tmp_db_path.stat().st_size < source_db.stat().st_size:
+            try:
+                shutil.copyfile(source_db, tmp_db_path)
+                os.chmod(tmp_db_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH)
+            except Exception as e:
+                print(f"Warning copying DB to /tmp: {e}")
     DB_NAME = tmp_db_path
 else:
     DB_NAME = BASE_DIR / 'db.sqlite3'
@@ -100,6 +106,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': DB_NAME,
+        'OPTIONS': {
+            'timeout': 20,
+        },
     }
 }
 
