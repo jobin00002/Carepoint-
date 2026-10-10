@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patient Portal - {{ user.get_full_name|default:user.username }} | CarePoint{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-4 bg-success text-white p-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 52px; height: 52px;">
+                <i class="fa-solid fa-bed-pulse fa-xl"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="fw-bold mb-0 text-dark">Welcome, {{ user.get_full_name|default:user.username }}</h2>
+                    <span class="badge bg-success text-white rounded-pill px-3 py-1">Patient Portal</span>
+                </div>
+                <span class="text-muted small">
+                    Manage 15-minute consultations, view digital tokens, inspect health meters, and review clinical triage history.
+                </span>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'health_meters' %}" class="btn btn-outline-info rounded-pill fw-bold btn-sm">
+                <i class="fa-solid fa-gauge-high me-1"></i> Health Meters
+            </a>
+            <a href="{% url 'book_appointment' %}" class="btn btn-primary rounded-pill fw-bold btn-sm">
+                <i class="fa-solid fa-calendar-plus me-1"></i> Book New 15-Min Slot
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Patient Active Appointments & Tokens (Requirement 6) -->
+        <div class="col-lg-8">
+            <div class="card-cp overflow-hidden mb-4">
+                <div class="card-cp-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-ticket text-primary me-2"></i>My Appointments & Token Passes</h5>
+                        <span class="text-muted small">Present your digital token number at the OPD clinic</span>
+                    </div>
+                    <span class="badge bg-primary text-white">{{ appointments.count }} Total Bookings</span>
+                </div>
+
+                <div class="card-cp-body">
+                    {% for appt in appointments %}
+                    <div class="p-4 rounded-4 border bg-white mb-3 shadow-sm position-relative overflow-hidden">
+                        {% if appt.status == 'SWAPPED' %}
+                        <div class="p-2 px-3 bg-warning-subtle text-warning-emphasis small fw-bold border-bottom mb-3 rounded-2">
+                            <i class="fa-solid fa-arrows-rotate me-1"></i> Rescheduled due to Emergency Priority Case
+                        </div>
+                        {% endif %}
+
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-3 text-center">
+                                <div class="token-big-badge py-2 px-3">
+                                    <div class="small fw-bold text-uppercase">TOKEN</div>
+                                    <div class="fs-1 fw-bold">#{{ appt.token_number }}</div>
+                                    <div class="font-monospace" style="font-size: 0.65rem;">{{ appt.token_code }}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h5 class="fw-bold text-dark mb-0">Dr. {{ appt.doctor.user.get_full_name|default:appt.doctor.user.username }}</h5>
+                                    <span class="badge bg-primary-subtle text-primary">{{ appt.doctor.specialty.name }}</span>
+                                </div>
+                                <div class="text-muted small mb-2">
+                                    <i class="fa-solid fa-hospital text-danger me-1"></i> {{ appt.doctor.hospital.name }} &bull;
+                                    <i class="fa-solid fa-door-open text-secondary ms-1 me-1"></i> Cabin: <strong>{{ appt.doctor.cabin_number }}</strong>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2 small">
+                                    <span class="badge bg-success-subtle text-success">
+                                        <i class="fa-solid fa-clock me-1"></i> {{ appt.duration_display }}
+                                    </span>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fa-solid fa-calendar me-1"></i> {{ appt.appointment_date|date:"l, F d, Y" }}
+                                    </span>
+                                    {% if appt.status == 'CONFIRMED' %}
+                                    <span class="badge bg-success text-white">Confirmed</span>
+                                    {% elif appt.status == 'IN_CONSULTATION' %}
+                                    <span class="badge bg-primary text-white">In Consultation Now</span>
+                                    {% elif appt.status == 'COMPLETED' %}
+                                    <span class="badge bg-secondary text-white">Completed</span>
+                                    {% elif appt.status == 'CANCELLED' %}
+                                    <span class="badge bg-danger text-white">Cancelled</span>
+                                    {% endif %}
+                                </div>
+
+                                {% if appt.doctor_notes %}
+                                <div class="mt-2 p-2 bg-light rounded small text-dark">
+                                    <strong>Doctor Notes:</strong> {{ appt.doctor_notes }}
+                                    {% if appt.prescription %}<br><strong>Prescription:</strong> {{ appt.prescription }}{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-3 text-md-end d-flex flex-column gap-2">
+                                <a href="{% url 'token_card' appt.id %}" class="btn btn-primary rounded-pill fw-bold btn-sm shadow-sm">
+                                    <i class="fa-solid fa-qrcode me-1"></i> View Token Pass
+                                </a>
+                                {% if appt.status == 'CONFIRMED' or appt.status == 'SWAPPED' %}
+                                <form method="post" action="{% url 'cancel_appointment' appt.id %}" onsubmit="return confirm('Cancel this appointment?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger rounded-pill btn-sm w-100">
+                                        Cancel Slot
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-calendar-xmark fa-3x mb-3 text-secondary opacity-50"></i>
+                        <h5>No Appointments Booked Yet</h5>
+                        <p class="small mb-3">Schedule your first 15-minute consultation with any hospital specialist.</p>
+                        <a href="{% url 'book_appointment' %}" class="btn btn-primary rounded-pill fw-bold px-4">
+                            Book 15-Minute Slot Now
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Past Symptom Checks -->
+            {% if symptom_checks %}
+            <div class="card-cp overflow-hidden">
+                <div class="card-cp-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-stethoscope text-secondary me-2"></i>My Symptom Triage Records</h5>
+                    <a href="{% url 'symptom_checker' %}" class="btn btn-outline-secondary btn-sm rounded-pill">New Check</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Risk Level</th>
+                                <th>Specialty Matched</th>
+                                <th>Symptoms Evaluated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sc in symptom_checks %}
+                            <tr>
+                                <td class="text-muted">{{ sc.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge {% if sc.is_emergency %}bg-danger{% elif sc.risk_level == 'HIGH' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
+                                        {{ sc.risk_level }}
+                                    </span>
+                                </td>
+                                <td><strong>{{ sc.recommended_specialty.name|default:'General Medicine' }}</strong></td>
+                                <td class="text-muted">{{ sc.symptoms|join:", "|title|truncatechars:30 }}</td>
+                                <td>
+                                    <a href="{% url 'book_appointment' %}" class="btn btn-outline-primary btn-sm rounded-pill py-0 px-2">Book</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar: Health Meters Summary (Requirement 7) -->
+        <div class="col-lg-4">
+            <!-- Vitals Summary Card -->
+            <div class="card-cp p-4 mb-4 border-info border-1 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-gauge-high text-info me-2"></i>My Health Meters</h5>
+                    <a href="{% url 'health_meters' %}" class="btn btn-info btn-sm text-white rounded-pill fw-bold">Live Gauges</a>
+                </div>
+
+                {% if latest_vital %}
+                <div class="d-flex flex-column gap-3 mb-3">
+                    <!-- Sugar -->
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-bold text-dark"><i class="fa-solid fa-cube text-primary me-1"></i> Sugar (Fasting)</span>
+                            <span class="badge {% if 'Normal' in latest_vital.sugar_status %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %}">{{ latest_vital.sugar_status }}</span>
+                        </div>
+                        <div class="fs-4 fw-bold text-primary">{{ latest_vital.sugar_fasting|default:'--' }} <span class="small text-muted fs-6">mg/dL</span></div>
+                    </div>
+
+                    <!-- Cholesterol -->
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-bold text-dark"><i class="fa-solid fa-droplet text-warning me-1"></i> Total Cholesterol</span>
+                            <span class="badge {% if 'Desirable' in latest_vital.cholesterol_status %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">{{ latest_vital.cholesterol_status }}</span>
+                        </div>
+                        <div class="fs-4 fw-bold text-warning">{{ latest_vital.cholesterol_total|default:'--' }} <span class="small text-muted fs-6">mg/dL</span></div>
+                    </div>
+
+                    <!-- BMI -->
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-bold text-dark"><i class="fa-solid fa-weight-scale text-success me-1"></i> BMI & Weight</span>
+                            <span class="badge {% if 'Normal' in latest_vital.weight_status %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %}">{{ latest_vital.weight_status }}</span>
+                        </div>
+                        <div class="fs-4 fw-bold text-success">{{ latest_vital.bmi|default:'--' }} <span class="small text-muted fs-6">kg/m² ({{ latest_vital.weight_kg }}kg)</span></div>
+                    </div>
+
+                    <!-- Pulse -->
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-bold text-dark"><i class="fa-solid fa-heart-pulse text-danger me-1"></i> Pulse Rate</span>
+                            <span class="badge bg-light text-dark border">{{ latest_vital.pulse_status }}</span>
+                        </div>
+                        <div class="fs-4 fw-bold text-danger">{{ latest_vital.pulse_rate|default:'--' }} <span class="small text-muted fs-6">BPM</span></div>
+                    </div>
+                </div>
+
+                <div class="text-muted small text-center">
+                    Recorded: {{ latest_vital.recorded_at|date:"M d, Y H:i" }}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fa-solid fa-heart-crack fa-2x mb-2 opacity-50 text-info"></i>
+                    <p class="small mb-2">No health meter vitals logged yet.</p>
+                    <a href="{% url 'health_meters' %}" class="btn btn-outline-info btn-sm rounded-pill">Take Meter Test</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Emergency Helpline Card -->
+            <div class="card-cp p-4 bg-danger text-white">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <i class="fa-solid fa-truck-medical fa-2x"></i>
+                    <div>
+                        <h6 class="fw-bold mb-0">Emergency 24/7 Helpline</h6>
+                        <span class="small opacity-75">Immediate ER Triage Support</span>
+                    </div>
+                </div>
+                <div class="fs-4 fw-bold mb-3">+1 (800) 911-CARE</div>
+                <a href="tel:911" class="btn btn-light rounded-pill text-danger fw-bold w-100 btn-sm">
+                    Call Ambulance / ER
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In - CarePoint Healthcare Portals{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="text-center mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-4 p-3 mb-3 shadow" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-lock fa-2x"></i>
+                </span>
+                <h3 class="fw-bold mb-1 text-dark">Healthcare Portal Sign In</h3>
+                <p class="text-muted small">Sign in with your username and password, or choose your dedicated portal below.</p>
+            </div>
+
+            <div class="card-cp p-4 p-md-5 border-primary border-1 shadow-sm mb-4">
+                <form method="post" action="{% url 'patient_login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small">Username <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" name="username" class="form-control border-start-0" placeholder="Enter username" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small">Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-key"></i></span>
+                            <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm mb-3">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In
+                    </button>
+
+                    <div class="text-center small text-muted pt-2 border-top">
+                        Don't have an account? <a href="{% url 'patient_register' %}" class="text-primary fw-bold text-decoration-none">Register as Patient</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Dedicated Portal Links (No quick click demo credentials) -->
+            <div class="card-cp p-3 bg-light border">
+                <div class="fw-bold text-dark small mb-2"><i class="fa-solid fa-layer-group text-primary me-1"></i> Specialized Portal Logins:</div>
+                <div class="d-flex flex-column gap-2 small">
+                    <a href="{% url 'admin_login' %}" class="text-decoration-none text-danger fw-semibold d-flex align-items-center justify-content-between p-2 rounded-2 bg-white border">
+                        <span><i class="fa-solid fa-shield-halved me-2"></i>Admin Portal Sign In</span>
+                        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                    </a>
+                    <a href="{% url 'hospital_login' %}" class="text-decoration-none text-primary fw-semibold d-flex align-items-center justify-content-between p-2 rounded-2 bg-white border">
+                        <span><i class="fa-solid fa-hospital me-2"></i>Hospital Portal Sign In</span>
+                        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                    </a>
+                    <a href="{% url 'doctor_login' %}" class="text-decoration-none text-secondary fw-semibold d-flex align-items-center justify-content-between p-2 rounded-2 bg-white border">
+                        <span><i class="fa-solid fa-user-doctor me-2"></i>Doctor Portal Sign In</span>
+                        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                    </a>
+                    <a href="{% url 'patient_login' %}" class="text-decoration-none text-success fw-semibold d-flex align-items-center justify-content-between p-2 rounded-2 bg-white border">
+                        <span><i class="fa-solid fa-bed-pulse me-2"></i>Patient Portal Sign In</span>
+                        <i class="fa-solid fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

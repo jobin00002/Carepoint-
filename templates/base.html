@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CarePoint - Smart Healthcare Appointments & Symptom Checker{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Emergency Bar -->
+    <div class="bg-danger text-white py-1 px-3 small no-print">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <i class="fa-solid fa-phone-volume me-1"></i> <strong>24/7 Clinical Emergency Helpline:</strong> +1 (800) 911-CARE
+            </div>
+            <div class="d-none d-md-block opacity-90">
+                CarePoint Integrated Health Network &bull; 15-Minute OPD Slot Scheduling
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    {% include 'navbar.html' %}
+
+    <!-- Flash Messages Container -->
+    {% if messages %}
+    <div class="container mt-3 no-print">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-flex align-items-center justify-content-between shadow-sm" role="alert">
+            <div>
+                {% if message.tags == 'error' or message.tags == 'danger' %}
+                <i class="fa-solid fa-circle-exclamation text-danger me-2"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>
+                {% elif message.tags == 'success' %}
+                <i class="fa-solid fa-circle-check text-success me-2"></i>
+                {% else %}
+                <i class="fa-solid fa-circle-info text-primary me-2"></i>
+                {% endif %}
+                {{ message }}
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Page Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

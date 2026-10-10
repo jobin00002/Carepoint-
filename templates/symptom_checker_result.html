@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Triage Evaluation Results - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'symptom_checker' %}">Symptom Checker</a></li>
+                    <li class="breadcrumb-item active">Triage Results</li>
+                </ol>
+            </nav>
+
+            <!-- Emergency Alert Banner if Critical -->
+            {% if is_emergency %}
+            <div class="card-cp overflow-hidden border-danger border-2 mb-4 shadow">
+                <div class="emergency-strip">
+                    <span><i class="fa-solid fa-triangle-exclamation me-2"></i> CRITICAL CLINICAL EMERGENCY DETECTED</span>
+                    <span>Triage Level: CRITICAL_EMERGENCY</span>
+                </div>
+                <div class="p-4 bg-danger-subtle text-danger-emphasis">
+                    <h4 class="fw-bold text-danger mb-2">Immediate Medical Intervention Required</h4>
+                    <p class="mb-3">
+                        Your selected symptoms indicate potential red-flag acute distress (such as acute coronary syndrome, severe respiratory crisis, or neurological deficit).
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="tel:911" class="btn btn-danger rounded-pill fw-bold px-4">
+                            <i class="fa-solid fa-phone-volume me-2"></i> Call 911 / ER Hotline (+1 800 911-CARE)
+                        </a>
+                        <a href="{% url 'book_appointment' %}?emergency=1" class="btn btn-outline-danger rounded-pill fw-bold px-4">
+                            <i class="fa-solid fa-arrows-rotate me-2"></i> Request Emergency Priority Slot Swap
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Triage Assessment Card -->
+            <div class="card-cp p-4 p-md-5 mb-4">
+                <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4 flex-wrap gap-2">
+                    <div>
+                        <span class="badge {% if is_emergency %}bg-danger{% elif risk_level == 'HIGH' %}bg-warning text-dark{% else %}bg-primary{% endif %} rounded-pill px-3 py-1 mb-2">
+                            Assessed Risk: {{ risk_level }}
+                        </span>
+                        <h3 class="fw-bold mb-1 text-dark">Clinical Triage Summary</h3>
+                        <div class="text-muted small">Based on {{ selected_symptoms|length }} reported symptoms &bull; Severity: {{ severity }} &bull; Duration: {{ duration }}</div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark border px-3 py-2 small">
+                            <i class="fa-solid fa-shield-heart text-success me-1"></i> AI & Rule-Based Triage
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Recommended Medical Specialty -->
+                <div class="p-4 rounded-4 bg-primary-subtle border border-primary-subtle mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white p-3 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                            <i class="fa-solid {{ recommended_specialty.icon }}"></i>
+                        </div>
+                        <div>
+                            <span class="text-primary fw-bold text-uppercase small tracking-wider">Recommended Medical Domain</span>
+                            <h4 class="fw-bold mb-0 text-dark">{{ recommended_specialty.name }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ recommended_specialty.description }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reported Symptoms Tags -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2">Evaluated Symptoms:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for sym in selected_symptoms %}
+                        <span class="badge bg-light text-dark border px-3 py-2">
+                            <i class="fa-solid fa-circle-dot text-primary me-1" style="font-size: 0.6rem;"></i> {{ sym|title }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Recommended Doctors for This Specialty -->
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-doctor text-secondary me-2"></i>Recommended Specialist Doctors (Available for 15-Min Slots)</h5>
+                
+                <div class="row g-3 mb-4">
+                    {% for doc in recommended_doctors %}
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-0">Dr. {{ doc.user.get_full_name|default:doc.user.username }}</h6>
+                                        <span class="small text-muted">{{ doc.qualification }}</span>
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success small">15m Slots</span>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    <i class="fa-solid fa-hospital text-primary me-1"></i> {{ doc.hospital.name }}
+                                </div>
+                                <div class="small text-muted mb-3">
+                                    <i class="fa-solid fa-door-open text-secondary me-1"></i> Cabin: {{ doc.cabin_number }} &bull; Fee: ${{ doc.consultation_fee }}
+                                </div>
+                            </div>
+                            <a href="{% url 'book_appointment' %}?doctor={{ doc.id }}" class="btn btn-primary btn-sm rounded-pill w-100 fw-bold">
+                                <i class="fa-solid fa-calendar-plus me-1"></i> Book 15-Min Slot With Dr. {{ doc.user.last_name|default:doc.user.username }}
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="text-muted">No specific doctor found for this department. Browse our full directory.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Action Footer -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-2">
+                    <a href="{% url 'symptom_checker' %}" class="btn btn-outline-secondary rounded-pill fw-semibold">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Check Other Symptoms
+                    </a>
+                    <a href="{% url 'health_meters' %}" class="btn btn-outline-info rounded-pill fw-semibold">
+                        <i class="fa-solid fa-gauge-high me-1"></i> Check Health Vitals & Meters
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

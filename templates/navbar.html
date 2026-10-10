@@ -1,0 +1,189 @@
+<nav class="navbar navbar-expand-lg navbar-carepoint sticky-top py-3 no-print">
+    <div class="container">
+        <a class="navbar-brand brand-logo" href="{% url 'home' %}">
+            <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 p-2 me-1" style="width: 36px; height: 36px;">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </span>
+            <span>Care<span class="text-secondary">Point</span></span>
+            <span class="brand-badge">Health 24/7</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold {% if request.resolver_match.url_name == 'hospital_list' or request.resolver_match.url_name == 'hospital_detail' %}active text-primary{% endif %}" href="{% url 'hospital_list' %}">
+                        <i class="fa-solid fa-hospital text-primary me-1"></i> Hospitals & Specialties
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold {% if request.resolver_match.url_name == 'symptom_checker' %}active text-primary{% endif %}" href="{% url 'symptom_checker' %}">
+                        <i class="fa-solid fa-stethoscope text-secondary me-1"></i> Symptom Checker
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold {% if request.resolver_match.url_name == 'health_meters' %}active text-primary{% endif %}" href="{% url 'health_meters' %}">
+                        <i class="fa-solid fa-gauge-high text-info me-1"></i> Health Meters
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold {% if request.resolver_match.url_name == 'book_appointment' %}active text-primary{% endif %}" href="{% url 'book_appointment' %}">
+                        <i class="fa-solid fa-calendar-plus text-success me-1"></i> Book 15-Min Slot
+                    </a>
+                </li>
+
+                <!-- Dedicated Portals Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-layer-group text-warning me-1"></i> Portals
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'admin_portal' %}">
+                                <i class="fa-solid fa-shield-halved text-danger"></i>
+                                <div>
+                                    <div class="fw-bold">Admin Portal</div>
+                                    <div class="small text-muted">System & Platform Manager</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'hospital_portal' %}">
+                                <i class="fa-solid fa-hospital text-primary"></i>
+                                <div>
+                                    <div class="fw-bold">Hospital Portal</div>
+                                    <div class="small text-muted">Departments & Hospital Doctors</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'doctor_portal' %}">
+                                <i class="fa-solid fa-user-doctor text-secondary"></i>
+                                <div>
+                                    <div class="fw-bold">Doctor Portal</div>
+                                    <div class="small text-muted">15-Min Slots & Token Queue Desk</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'patient_portal' %}">
+                                <i class="fa-solid fa-bed-pulse text-success"></i>
+                                <div>
+                                    <div class="fw-bold">Patient Portal</div>
+                                    <div class="small text-muted">Bookings, Token Pass & Health Logs</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2">
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle rounded-pill px-3 fw-semibold d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-circle-user fa-lg"></i>
+                        <span>{{ user.first_name|default:user.username }}</span>
+                        <span class="badge bg-primary text-white rounded-pill ms-1">{{ user_role|default:'PATIENT' }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                        <li><h6 class="dropdown-header">Signed in as <strong>{{ user.username }}</strong></h6></li>
+                        <li><a class="dropdown-item" href="{% url 'dashboard_redirect' %}"><i class="fa-solid fa-gauge me-2"></i>My Portal Dashboard</a></li>
+                        {% if is_patient %}
+                        <li><a class="dropdown-item" href="{% url 'health_meters' %}"><i class="fa-solid fa-heart-pulse me-2"></i>My Vitals & Meters</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign Out</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <!-- Separate Sign In Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle rounded-pill px-3 fw-semibold" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3" style="min-width: 240px;">
+                        <li><h6 class="dropdown-header text-uppercase small">Select Portal Login</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'admin_login' %}">
+                                <i class="fa-solid fa-shield-halved text-danger"></i>
+                                <div>
+                                    <div class="fw-bold">Admin Portal</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Central Administrator</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'hospital_login' %}">
+                                <i class="fa-solid fa-hospital text-primary"></i>
+                                <div>
+                                    <div class="fw-bold">Hospital Portal</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Hospital Management</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'doctor_login' %}">
+                                <i class="fa-solid fa-user-doctor text-secondary"></i>
+                                <div>
+                                    <div class="fw-bold">Doctor Portal</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Physicians & Cabin Desk</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'patient_login' %}">
+                                <i class="fa-solid fa-bed-pulse text-success"></i>
+                                <div>
+                                    <div class="fw-bold">Patient Portal</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Appointments & Tokens</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Separate Register Dropdown (No register for admin) -->
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle rounded-pill px-3 fw-semibold shadow-sm" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-user-plus me-1"></i> Register
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3" style="min-width: 220px;">
+                        <li><h6 class="dropdown-header text-uppercase small">Create New Account</h6></li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'patient_register' %}">
+                                <i class="fa-solid fa-bed-pulse text-success"></i>
+                                <div>
+                                    <div class="fw-bold">Patient Account</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Book 15-min slots</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'doctor_register' %}">
+                                <i class="fa-solid fa-user-doctor text-secondary"></i>
+                                <div>
+                                    <div class="fw-bold">Doctor Account</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Manage OPD schedule</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{% url 'hospital_register' %}">
+                                <i class="fa-solid fa-hospital text-primary"></i>
+                                <div>
+                                    <div class="fw-bold">Register Hospital</div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Add hospital facility</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

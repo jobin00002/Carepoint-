@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Select Healthcare Portal - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">Secure Healthcare Network</span>
+        <h2 class="fw-bold mb-2">Select Your Healthcare Portal</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Please choose your portal destination to sign in or register with your authorized clinical role.
+        </p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- 1. Admin Portal (Login ONLY - No registration) -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card-cp h-100 p-4 d-flex flex-column justify-content-between text-center border-danger border-1">
+                <div>
+                    <div class="rounded-circle bg-danger-subtle text-danger p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                        <i class="fa-solid fa-shield-halved fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-dark">Admin Portal</h5>
+                    <p class="text-muted small mb-4">
+                        For system administrators. Central oversight of all hospitals, doctor credentials, and emergency swap audit logs.
+                    </p>
+                    <div class="badge bg-light text-muted border mb-3 small">Admin Login Only &bull; Restricted</div>
+                </div>
+
+                <div>
+                    <a href="{% url 'admin_login' %}" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Admin Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Hospital Portal (Login & Register) -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card-cp h-100 p-4 d-flex flex-column justify-content-between text-center border-primary border-1">
+                <div>
+                    <div class="rounded-circle bg-primary-subtle text-primary p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                        <i class="fa-solid fa-hospital fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-dark">Hospital Portal</h5>
+                    <p class="text-muted small mb-4">
+                        For hospital administrators & management. Oversee hospital departments, resident doctors, OPD queue, and emergency priority swaps.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'hospital_login' %}" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Hospital Sign In
+                    </a>
+                    <a href="{% url 'hospital_register' %}" class="btn btn-outline-primary w-100 rounded-pill fw-semibold py-2 btn-sm">
+                        <i class="fa-solid fa-plus me-1"></i> Register Hospital
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Doctor Portal (Login & Register) -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card-cp h-100 p-4 d-flex flex-column justify-content-between text-center border-secondary border-1">
+                <div>
+                    <div class="rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; background: #ccfbf1; color: #0f766e;">
+                        <i class="fa-solid fa-user-doctor fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-dark">Doctor Portal</h5>
+                    <p class="text-muted small mb-4">
+                        For practicing physicians & specialists. Access live 15-minute slot timetables, patient token queue desk, and patient vitals inspection.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'doctor_login' %}" class="btn btn-secondary w-100 rounded-pill fw-bold py-2 shadow-sm" style="background: #0f766e; border-color: #0f766e;">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Doctor Sign In
+                    </a>
+                    <a href="{% url 'doctor_register' %}" class="btn btn-outline-secondary w-100 rounded-pill fw-semibold py-2 btn-sm">
+                        <i class="fa-solid fa-user-plus me-1"></i> Register as Doctor
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Patient Portal (Login & Register) -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card-cp h-100 p-4 d-flex flex-column justify-content-between text-center border-success border-1">
+                <div>
+                    <div class="rounded-circle bg-success-subtle text-success p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                        <i class="fa-solid fa-bed-pulse fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-dark">Patient Portal</h5>
+                    <p class="text-muted small mb-4">
+                        For patients & families. Book 15-minute consultations, download digital token passes, track health meters, and review symptom records.
+                    </p>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'patient_login' %}" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Patient Sign In
+                    </a>
+                    <a href="{% url 'patient_register' %}" class="btn btn-outline-success w-100 rounded-pill fw-semibold py-2 btn-sm">
+                        <i class="fa-solid fa-user-plus me-1"></i> Register as Patient
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

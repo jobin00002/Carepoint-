@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Interactive Health Meters - Sugar, Cholesterol, BMI & Pulse | CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+        <div>
+            <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">Requirement 7</span>
+            <h2 class="fw-bold mb-1">Interactive Health Meters Suite</h2>
+            <p class="text-muted mb-0">Live physiological gauges for Blood Sugar, Lipid Cholesterol, BMI Overweight/Underweight, and Pulse Rate.</p>
+        </div>
+
+        <!-- Quick Demo Presets -->
+        <div class="d-flex gap-2 flex-wrap">
+            <span class="small fw-bold text-muted align-self-center">Test Presets:</span>
+            <button type="button" class="btn btn-outline-success btn-sm rounded-pill fw-semibold" onclick="applyMeterPreset('healthy')">
+                <i class="fa-solid fa-heart-circle-check me-1"></i> Normal Baseline
+            </button>
+            <button type="button" class="btn btn-outline-warning btn-sm rounded-pill fw-semibold" onclick="applyMeterPreset('high_sugar')">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Pre-Diabetic / Overweight
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-semibold" onclick="applyMeterPreset('tachycardia')">
+                <i class="fa-solid fa-heart-pulse me-1"></i> High Pulse Rate
+            </button>
+        </div>
+    </div>
+
+    <!-- The 4 Health Meters Grid (Requirement 7) -->
+    <div class="row g-4 mb-5">
+        <!-- 1. BLOOD SUGAR METER -->
+        <div class="col-lg-6">
+            <div class="meter-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle bg-primary-subtle text-primary p-2 d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-cube"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Blood Sugar Meter</h5>
+                            <span class="text-muted small">Glucose (mg/dL)</span>
+                        </div>
+                    </div>
+                    <select id="sugar_type_select" class="form-select form-select-sm w-auto">
+                        <option value="fasting">Fasting (8h)</option>
+                        <option value="postprandial">Post-Prandial (After Meal)</option>
+                    </select>
+                </div>
+
+                <!-- Dial Gauge -->
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 220 130">
+                        <defs>
+                            <linearGradient id="sugarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38bdf8"/>
+                                <stop offset="35%" stop-color="#10b981"/>
+                                <stop offset="65%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#e11d48"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Arc Track -->
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#e2e8f0" stroke-width="20" stroke-linecap="round"/>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#sugarGrad)" stroke-width="16" stroke-linecap="round"/>
+                        
+                        <!-- Center Pin -->
+                        <circle cx="110" cy="110" r="10" fill="#0f172a"/>
+                        
+                        <!-- Needle Pointer -->
+                        <g id="sugar_needle" class="gauge-needle">
+                            <line x1="110" y1="110" x2="110" y2="30" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+                            <polygon points="105,38 115,38 110,24" fill="#0f172a"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Value & Status -->
+                <div class="text-center mt-2 mb-3">
+                    <div class="meter-value-display text-dark">
+                        <span id="sugar_val_display">94.0</span> <span class="meter-unit">mg/dL</span>
+                    </div>
+                    <div>
+                        <span id="sugar_status_pill" class="meter-status-pill status-normal">Normal (70-99 mg/dL)</span>
+                    </div>
+                    <div id="sugar_advice_text" class="small text-muted mt-2 px-3">
+                        Blood glucose level within healthy clinical range.
+                    </div>
+                </div>
+
+                <!-- Reactive Controls -->
+                <div class="p-3 bg-light rounded-3 border">
+                    <label class="form-label small fw-bold text-dark d-flex justify-content-between mb-1">
+                        <span>Adjust Glucose Value</span>
+                        <span class="text-muted">Clinical Range: 40 - 300 mg/dL</span>
+                    </label>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-8">
+                            <input type="range" class="form-range" id="sugar_slider" min="40" max="250" value="94" oninput="document.getElementById('sugar_fasting_input').value=this.value; document.getElementById('sugar_fasting_input').dispatchEvent(new Event('input'));">
+                        </div>
+                        <div class="col-4">
+                            <input type="number" id="sugar_fasting_input" class="form-control form-control-sm text-center fw-bold" value="94" step="0.5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. CHOLESTEROL METER -->
+        <div class="col-lg-6">
+            <div class="meter-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle bg-warning-subtle text-warning p-2 d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-droplet"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Cholesterol Meter</h5>
+                            <span class="text-muted small">Total Lipid Profile (mg/dL)</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-light text-dark border small">NCEP ATP III Standards</span>
+                </div>
+
+                <!-- Dial Gauge -->
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 220 130">
+                        <defs>
+                            <linearGradient id="cholesGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#10b981"/>
+                                <stop offset="50%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#e11d48"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#e2e8f0" stroke-width="20" stroke-linecap="round"/>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#cholesGrad)" stroke-width="16" stroke-linecap="round"/>
+                        
+                        <circle cx="110" cy="110" r="10" fill="#0f172a"/>
+                        
+                        <g id="cholesterol_needle" class="gauge-needle">
+                            <line x1="110" y1="110" x2="110" y2="30" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+                            <polygon points="105,38 115,38 110,24" fill="#0f172a"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Value & Status -->
+                <div class="text-center mt-2 mb-3">
+                    <div class="meter-value-display text-dark">
+                        <span id="cholesterol_val_display">185</span> <span class="meter-unit">mg/dL</span>
+                    </div>
+                    <div>
+                        <span id="cholesterol_status_pill" class="meter-status-pill status-normal">Desirable (&lt;200 mg/dL)</span>
+                    </div>
+                    <div id="cholesterol_advice_text" class="small text-muted mt-2 px-3">
+                        Optimal cardiovascular lipid profile.
+                    </div>
+                </div>
+
+                <!-- Reactive Controls -->
+                <div class="p-3 bg-light rounded-3 border">
+                    <label class="form-label small fw-bold text-dark d-flex justify-content-between mb-1">
+                        <span>Total Cholesterol</span>
+                        <span class="text-muted">Target: &lt;200 mg/dL</span>
+                    </label>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-8">
+                            <input type="range" class="form-range" id="cholesterol_slider" min="100" max="320" value="185" oninput="document.getElementById('cholesterol_total_input').value=this.value; document.getElementById('cholesterol_total_input').dispatchEvent(new Event('input'));">
+                        </div>
+                        <div class="col-4">
+                            <input type="number" id="cholesterol_total_input" class="form-control form-control-sm text-center fw-bold" value="185">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. OVERWEIGHT / UNDERWEIGHT METER (BMI) -->
+        <div class="col-lg-6">
+            <div class="meter-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle bg-success-subtle text-success p-2 d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-weight-scale"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Overweight / Underweight Meter</h5>
+                            <span class="text-muted small">Body Mass Index (BMI kg/m²)</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-light text-dark border small">WHO Standard Scale</span>
+                </div>
+
+                <!-- Dial Gauge -->
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 220 130">
+                        <defs>
+                            <linearGradient id="bmiGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38bdf8"/>
+                                <stop offset="30%" stop-color="#10b981"/>
+                                <stop offset="65%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#e11d48"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#e2e8f0" stroke-width="20" stroke-linecap="round"/>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#bmiGrad)" stroke-width="16" stroke-linecap="round"/>
+                        
+                        <circle cx="110" cy="110" r="10" fill="#0f172a"/>
+                        
+                        <g id="bmi_needle" class="gauge-needle">
+                            <line x1="110" y1="110" x2="110" y2="30" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+                            <polygon points="105,38 115,38 110,24" fill="#0f172a"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Value & Status -->
+                <div class="text-center mt-2 mb-3">
+                    <div class="meter-value-display text-dark">
+                        <span id="bmi_val_display">23.7</span> <span class="meter-unit">kg/m²</span>
+                    </div>
+                    <div>
+                        <span id="bmi_status_pill" class="meter-status-pill status-normal">Normal Weight (18.5 - 24.9)</span>
+                    </div>
+                    <div id="bmi_advice_text" class="small text-muted mt-2 px-3">
+                        Optimal BMI associated with lowest risk of metabolic disorders.
+                    </div>
+                    <div class="small text-primary fw-semibold mt-1">
+                        Ideal Weight Range for Height: <span id="ideal_weight_display">56.7 kg - 76.2 kg</span>
+                    </div>
+                </div>
+
+                <!-- Dual Controls: Height & Weight -->
+                <div class="p-3 bg-light rounded-3 border">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-dark mb-1">Weight (kg)</label>
+                            <input type="number" id="weight_kg_input" class="form-control form-control-sm text-center fw-bold" value="72.5" step="0.5" min="25" max="250">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-dark mb-1">Height (cm)</label>
+                            <input type="number" id="height_cm_input" class="form-control form-control-sm text-center fw-bold" value="175" step="1" min="100" max="240">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. PULSE RATE METER -->
+        <div class="col-lg-6">
+            <div class="meter-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle bg-danger-subtle text-danger p-2 d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Pulse Rate Meter</h5>
+                            <span class="text-muted small">Resting Heart Rate (BPM)</span>
+                        </div>
+                    </div>
+                    <!-- Live Pulsating Heart -->
+                    <div class="text-end">
+                        <span id="pulse_live_heart" class="pulse-heart-icon" title="Pulsating at exact measured BPM">
+                            <i class="fa-solid fa-heart"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Dial Gauge -->
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 220 130">
+                        <defs>
+                            <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38bdf8"/>
+                                <stop offset="35%" stop-color="#10b981"/>
+                                <stop offset="70%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#e11d48"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#e2e8f0" stroke-width="20" stroke-linecap="round"/>
+                        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#pulseGrad)" stroke-width="16" stroke-linecap="round"/>
+                        
+                        <circle cx="110" cy="110" r="10" fill="#0f172a"/>
+                        
+                        <g id="pulse_needle" class="gauge-needle">
+                            <line x1="110" y1="110" x2="110" y2="30" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
+                            <polygon points="105,38 115,38 110,24" fill="#0f172a"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Value & Status -->
+                <div class="text-center mt-2 mb-3">
+                    <div class="meter-value-display text-dark">
+                        <span id="pulse_val_display">72</span> <span class="meter-unit">BPM</span>
+                    </div>
+                    <div>
+                        <span id="pulse_status_pill" class="meter-status-pill status-normal">Normal (60-100 BPM)</span>
+                    </div>
+                    <div id="pulse_advice_text" class="small text-muted mt-2 px-3">
+                        Normal resting sinus rhythm.
+                    </div>
+                </div>
+
+                <!-- Reactive Controls -->
+                <div class="p-3 bg-light rounded-3 border">
+                    <label class="form-label small fw-bold text-dark d-flex justify-content-between mb-1">
+                        <span>Resting Beats Per Minute</span>
+                        <span class="text-muted">Bradycardia &lt;60 | Tachycardia &gt;100</span>
+                    </label>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-8">
+                            <input type="range" class="form-range" id="pulse_slider" min="40" max="150" value="72" oninput="document.getElementById('pulse_rate_input').value=this.value; document.getElementById('pulse_rate_input').dispatchEvent(new Event('input'));">
+                        </div>
+                        <div class="col-4">
+                            <input type="number" id="pulse_rate_input" class="form-control form-control-sm text-center fw-bold" value="72">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Vitals to Patient Health Record -->
+    {% if user.is_authenticated %}
+    <div class="card-cp p-4 p-md-5 mb-5">
+        <h4 class="fw-bold mb-2 text-dark"><i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i>Save Readings to Patient Medical Profile</h4>
+        <p class="text-muted small mb-4">Record your meter readings into your permanent health profile so doctors can review them during appointments.</p>
+
+        <form method="post" action="{% url 'health_meters' %}">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Fasting Sugar (mg/dL)</label>
+                    <input type="number" step="0.1" name="sugar_fasting" class="form-control" value="94.0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Postprandial Sugar (mg/dL)</label>
+                    <input type="number" step="0.1" name="sugar_postprandial" class="form-control" placeholder="Optional">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Total Cholesterol (mg/dL)</label>
+                    <input type="number" step="0.1" name="cholesterol_total" class="form-control" value="185.0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Pulse Rate (BPM)</label>
+                    <input type="number" name="pulse_rate" class="form-control" value="72">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Weight (kg)</label>
+                    <input type="number" step="0.1" name="weight_kg" class="form-control" value="72.5">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Height (cm)</label>
+                    <input type="number" step="0.1" name="height_cm" class="form-control" value="175.0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Clinical Notes / Feeling</label>
+                    <input type="text" name="notes" class="form-control" placeholder="e.g. Taken post morning walk, feeling energetic.">
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                        <i class="fa-solid fa-floppy-disk me-1"></i> Save to Health History
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Past Vitals Table -->
+    {% if past_vitals %}
+    <div class="card-cp p-4">
+        <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i>Your Past Vitals History</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small">
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Sugar Fasting</th>
+                        <th>Cholesterol</th>
+                        <th>BMI (Weight / Height)</th>
+                        <th>Pulse Rate</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    {% for v in past_vitals %}
+                    <tr>
+                        <td class="text-muted">{{ v.recorded_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if v.sugar_fasting %}
+                            <strong>{{ v.sugar_fasting }} mg/dL</strong>
+                            <span class="badge {% if 'Normal' in v.sugar_status %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} ms-1">{{ v.sugar_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            {% if v.cholesterol_total %}
+                            <strong>{{ v.cholesterol_total }} mg/dL</strong>
+                            <span class="badge {% if 'Desirable' in v.cholesterol_status %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} ms-1">{{ v.cholesterol_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            {% if v.bmi %}
+                            <strong>{{ v.bmi }}</strong> ({{ v.weight_kg }}kg / {{ v.height_cm }}cm)
+                            <span class="badge {% if 'Normal' in v.weight_status %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} ms-1">{{ v.weight_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            {% if v.pulse_rate %}
+                            <strong>{{ v.pulse_rate }} BPM</strong>
+                            <span class="badge bg-light text-dark border ms-1">{{ v.pulse_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td class="text-muted">{{ v.notes|default:'Baseline' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info rounded-4 d-flex align-items-center justify-content-between p-4">
+        <div>
+            <h6 class="fw-bold mb-1">Want to track your health vitals over time?</h6>
+            <span class="small">Sign in or register a free patient account to store your daily meter history and share with doctors.</span>
+        </div>
+        <a href="{% url 'login' %}" class="btn btn-primary rounded-pill px-4 fw-bold">Sign In to Save</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/health_meters.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Interactive Symptom Checker & Clinical Triage - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <span class="badge bg-secondary text-white rounded-pill px-3 py-1 mb-2">Clinical Triage Engine</span>
+                <h2 class="fw-bold mb-1">Interactive Symptom Checker</h2>
+                <p class="text-muted mx-auto" style="max-width: 650px;">
+                    Select your symptoms across biological systems to assess clinical risk levels, detect critical emergency red flags, and get matched with the right medical specialist.
+                </p>
+            </div>
+
+            <!-- Emergency Warning Banner -->
+            <div class="alert alert-danger rounded-4 p-3 d-flex align-items-center gap-3 mb-4 shadow-sm">
+                <div class="rounded-circle bg-danger text-white p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                    <i class="fa-solid fa-triangle-exclamation fa-lg"></i>
+                </div>
+                <div class="small">
+                    <strong class="d-block text-danger">Life-Threatening Emergency Warning:</strong>
+                    <span>If you are experiencing severe chest pain, sudden numbness/paralysis, difficulty breathing, or severe trauma, call <strong>911</strong> or our 24/7 ER hotline <strong>+1 (800) 911-CARE</strong> immediately.</span>
+                </div>
+            </div>
+
+            <!-- Symptom Form -->
+            <div class="card-cp p-4 p-md-5">
+                <form method="post" action="{% url 'symptom_checker' %}">
+                    {% csrf_token %}
+
+                    <!-- Patient Demographics -->
+                    <div class="row g-3 mb-4 p-3 bg-light rounded-4 border">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">Patient Age</label>
+                            <input type="number" name="patient_age" class="form-control" value="32" min="1" max="120" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">Symptom Severity</label>
+                            <select name="severity" class="form-select">
+                                <option value="MILD">Mild (Manageable at home)</option>
+                                <option value="MODERATE" selected>Moderate (Disrupting routine)</option>
+                                <option value="SEVERE">Severe (Intense / Incapacitating)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">Duration</label>
+                            <select name="duration" class="form-select">
+                                <option value="Few hours">Few hours</option>
+                                <option value="1-3 days" selected>1-3 days</option>
+                                <option value="1-2 weeks">1-2 weeks</option>
+                                <option value="More than a month">More than a month</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Symptoms Catalog Grid -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i>Select Present Symptoms</h5>
+                    
+                    <!-- 1. Heart & Cardiovascular -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-heart-pulse me-1"></i> Cardiovascular & Chest Symptoms</h6>
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer hover-shadow">
+                                    <input type="checkbox" name="symptoms" value="chest_pain" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-danger">Chest Pain / Pressure <span class="badge bg-danger text-white ms-1">Urgent</span></span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer hover-shadow">
+                                    <input type="checkbox" name="symptoms" value="palpitations" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Heart Palpitations / Racing Pulse</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer hover-shadow">
+                                    <input type="checkbox" name="symptoms" value="shortness_of_breath" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-danger">Shortness of Breath <span class="badge bg-danger text-white ms-1">Urgent</span></span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer hover-shadow">
+                                    <input type="checkbox" name="symptoms" value="high_blood_pressure" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">High Blood Pressure Readings</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Brain & Nervous System -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-brain me-1"></i> Brain & Neurological Symptoms</h6>
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="headache" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Severe Throbbing Headache</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="dizziness" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Dizziness / Vertigo / Lightheadedness</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="numbness" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Numbness or Tingling in Limbs</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="facial_droop" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-danger">Facial Droop / Speech Difficulty <span class="badge bg-danger text-white ms-1">Stroke Alert</span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Bones, Joints & Orthopedics -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-secondary mb-2"><i class="fa-solid fa-bone me-1"></i> Bones, Joints & Musculoskeletal</h6>
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="joint_pain" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Joint Pain / Knee / Hip Ache</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="swollen_joints" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Swelling or Redness around Joints</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="back_pain" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Chronic or Acute Back Pain</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Skin & Dermatology -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-warning mb-2"><i class="fa-solid fa-hand-dots me-1"></i> Skin & Dermatology</h6>
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="rash" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Itchy Skin Rash / Hives</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="skin_lesion" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Unusual Skin Lesions / Acne</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Digestive & Gastro -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-info mb-2"><i class="fa-solid fa-virus me-1"></i> Digestive & Abdominal</h6>
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="abdominal_pain" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Abdominal Cramps / Severe Stomach Pain</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2 w-100 cursor-pointer">
+                                    <input type="checkbox" name="symptoms" value="acid_reflux" class="form-check-input mt-0">
+                                    <span class="small fw-semibold text-dark">Acid Reflux / Nausea / Heartburn</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow">
+                            <i class="fa-solid fa-calculator me-2"></i> Evaluate Symptoms & Match Specialists
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

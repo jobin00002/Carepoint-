@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor Registration - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-4 p-3 mb-3 shadow" style="width: 60px; height: 60px; background: #ccfbf1; color: #0f766e;">
+                    <i class="fa-solid fa-user-doctor fa-2x"></i>
+                </span>
+                <h3 class="fw-bold mb-1 text-dark">Register as Specialist Doctor</h3>
+                <p class="text-muted small">Join your hospital department, set your cabin room, and offer guaranteed 15-minute consultation slots.</p>
+            </div>
+
+            <div class="card-cp p-4 p-md-5 border-secondary border-1 shadow-sm">
+                <form method="post" action="{% url 'doctor_register' %}">
+                    {% csrf_token %}
+
+                    <!-- Section 1: Doctor Personal & Login Account -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user me-2 text-primary"></i>Personal & Account Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">First Name <span class="text-danger">*</span></label>
+                            <input type="text" name="first_name" class="form-control" placeholder="Dr. Sarah" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" name="last_name" class="form-control" placeholder="Jenkins" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" placeholder="e.g. dr_sarah" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Professional Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="doctor@hospital.org" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Phone / Mobile <span class="text-danger">*</span></label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+1 (555) 019-2834" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Slot Duration</label>
+                            <input type="text" class="form-control" value="Strict 15 Minutes (Standard)" readonly disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" required placeholder="Create password">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" name="confirm_password" class="form-control" required placeholder="Confirm password">
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Clinical Practice & Hospital Affiliation -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-hospital-user me-2 text-secondary"></i>Clinical Practice Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Affiliated Hospital <span class="text-danger">*</span></label>
+                            <select name="hospital" class="form-select" required>
+                                <option value="">-- Choose Hospital --</option>
+                                {% for h in hospitals %}
+                                <option value="{{ h.id }}">{{ h.name }} ({{ h.city }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Medical Specialty / Department <span class="text-danger">*</span></label>
+                            <select name="specialty" class="form-select" required>
+                                <option value="">-- Choose Specialty --</option>
+                                {% for s in specialties %}
+                                <option value="{{ s.id }}">{{ s.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Degrees & Qualifications <span class="text-danger">*</span></label>
+                            <input type="text" name="qualification" class="form-control" placeholder="e.g. MBBS, MD (Cardiology)" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Cabin / Consultation Room <span class="text-danger">*</span></label>
+                            <input type="text" name="cabin_number" class="form-control" placeholder="e.g. Room 204 (Heart Wing)" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Years of Experience</label>
+                            <input type="number" name="experience_years" class="form-control" value="8" min="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Consultation Fee ($ USD)</label>
+                            <input type="number" step="0.01" name="consultation_fee" class="form-control" value="500.00" min="0">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Professional Bio / Clinical Focus</label>
+                            <textarea name="bio" class="form-control" rows="2" placeholder="Brief summary of clinical specialization, procedures, and background..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-secondary w-100 rounded-pill fw-bold py-3 shadow mb-3" style="background: #0f766e; border-color: #0f766e;">
+                        <i class="fa-solid fa-stethoscope me-2"></i> Register as Doctor & Open Portal
+                    </button>
+
+                    <div class="text-center small text-muted">
+                        Already have a doctor account? <a href="{% url 'doctor_login' %}" class="text-primary fw-bold text-decoration-none">Sign In to Doctor Portal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

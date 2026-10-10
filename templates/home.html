@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CarePoint - Smart Healthcare Appointments, 15-Min Slots, Emergency Swaps & Vitals Meters{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 bg-white border-bottom position-relative overflow-hidden">
+    <div class="container py-lg-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary-subtle text-primary fw-bold small mb-3">
+                    <i class="fa-solid fa-sparkles"></i> Next-Gen Smart Hospital & OPD Network
+                </div>
+                <h1 class="display-4 fw-extrabold text-dark tracking-tight mb-3">
+                    Precision Healthcare Appointments & <span class="text-primary">Instant Clinical Triage</span>
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Book guaranteed <strong>15-minute consultation slots</strong>, avoid double-booking, receive instant <strong>digital patient tokens</strong>, and triage emergencies with our intelligent <strong>emergency swap engine</strong>.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fa-solid fa-calendar-check me-2"></i> Book 15-Min Slot
+                    </a>
+                    <a href="{% url 'symptom_checker' %}" class="btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold">
+                        <i class="fa-solid fa-stethoscope me-2"></i> Symptom Checker
+                    </a>
+                    <a href="{% url 'health_meters' %}" class="btn btn-outline-info btn-lg rounded-pill px-4 fw-bold">
+                        <i class="fa-solid fa-gauge-high me-2"></i> Health Meters
+                    </a>
+                </div>
+
+                <!-- Emergency Notice -->
+                <div class="p-3 rounded-4 bg-danger-subtle border border-danger-subtle d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-danger text-white p-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="fa-solid fa-truck-medical"></i>
+                    </div>
+                    <div class="small">
+                        <strong class="text-danger d-block">Critical Emergency Case Arrived?</strong>
+                        <span class="text-danger-emphasis">Our <strong>Emergency Swap Protocol</strong> allows hospitals and doctors to pre-emptively allocate urgent slots and reschedule non-critical bookings automatically.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- Interactive Quick Health Card -->
+                <div class="card-cp p-4 position-relative">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">
+                            <i class="fa-solid fa-circle-check me-1"></i> Live Hospital Status
+                        </span>
+                        <span class="text-muted small">Updated Realtime</span>
+                    </div>
+
+                    <div class="row g-3 text-center mb-4">
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="text-primary fw-bolder fs-3">{{ stats.total_hospitals }}</div>
+                                <div class="small text-muted fw-semibold">Partner Hospitals</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="text-secondary fw-bolder fs-3">{{ stats.total_doctors }}</div>
+                                <div class="small text-muted fw-semibold">Specialist Doctors</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="text-success fw-bolder fs-3">15 Min</div>
+                                <div class="small text-muted fw-semibold">Slot Guarantee</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border">
+                                <div class="text-danger fw-bolder fs-3">Instant</div>
+                                <div class="small text-muted fw-semibold">Emergency Swap</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-3 bg-primary text-white text-center">
+                        <div class="fw-bold mb-1"><i class="fa-solid fa-ticket me-1"></i> Digital Token Pass Generated for Every Booking</div>
+                        <div class="small opacity-75">Track live wait times and cabin queue on your phone.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 Dedicated Portals Showcase -->
+<section class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">Role-Based Access</span>
+            <h2 class="fw-bold">4 Dedicated Healthcare Portals</h2>
+            <p class="text-muted mx-auto" style="max-width: 650px;">
+                CarePoint provides dedicated, secure interfaces customized specifically for administrators, hospital management, physicians, and patients.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Admin Portal -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card-cp h-100 p-4 d-flex flex-column">
+                    <div class="rounded-3 bg-danger-subtle text-danger p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 54px; height: 54px;">
+                        <i class="fa-solid fa-shield-halved fa-xl"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Admin Portal</h5>
+                    <p class="text-muted small flex-grow-1">
+                        Global control center: manage all hospitals, audit emergency slot swap logs, doctor licenses, and system-wide analytics.
+                    </p>
+                    <a href="{% url 'admin_portal' %}" class="btn btn-outline-danger btn-sm rounded-pill w-100 fw-bold mt-2">
+                        Open Admin Portal <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hospital Portal -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card-cp h-100 p-4 d-flex flex-column">
+                    <div class="rounded-3 bg-primary-subtle text-primary p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 54px; height: 54px;">
+                        <i class="fa-solid fa-hospital fa-xl"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Hospital Portal</h5>
+                    <p class="text-muted small flex-grow-1">
+                        Individual hospital desk: manage departments, assign doctor cabins, oversee hospital queue, and trigger emergency swaps.
+                    </p>
+                    <a href="{% url 'hospital_portal' %}" class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold mt-2">
+                        Open Hospital Portal <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Doctor Portal -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card-cp h-100 p-4 d-flex flex-column">
+                    <div class="rounded-3 bg-teal-subtle text-secondary p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 54px; height: 54px; background: #ccfbf1; color: #0f766e;">
+                        <i class="fa-solid fa-user-doctor fa-xl"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Doctor Portal</h5>
+                    <p class="text-muted small flex-grow-1">
+                        Live 15-minute slot schedule, Token Desk with <em>Call Next</em> controller, patient vitals & sugar/cholesterol inspection.
+                    </p>
+                    <a href="{% url 'doctor_portal' %}" class="btn btn-outline-secondary btn-sm rounded-pill w-100 fw-bold mt-2">
+                        Open Doctor Portal <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Patient Portal -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card-cp h-100 p-4 d-flex flex-column">
+                    <div class="rounded-3 bg-success-subtle text-success p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 54px; height: 54px;">
+                        <i class="fa-solid fa-bed-pulse fa-xl"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Patient Portal</h5>
+                    <p class="text-muted small flex-grow-1">
+                        View upcoming 15-min appointments, download printable digital token passes, track health meters, and review symptom records.
+                    </p>
+                    <a href="{% url 'patient_portal' %}" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-bold mt-2">
+                        Open Patient Portal <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Requirement 7 Spotlight: Health Meters Suite -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="badge bg-info-subtle text-info-emphasis px-3 py-1 rounded-pill fw-bold mb-2">
+                    <i class="fa-solid fa-heart-pulse me-1"></i> Requirement 7
+                </span>
+                <h2 class="fw-bold mb-3">Interactive Health Meters Suite</h2>
+                <p class="text-muted mb-4">
+                    Monitor and evaluate your vital health parameters with live interactive speedometer meters and clinical status classifications:
+                </p>
+
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-circle bg-primary-subtle text-primary"><i class="fa-solid fa-cube"></i></div>
+                        <div>
+                            <strong class="d-block text-dark">1. Blood Sugar Meter</strong>
+                            <span class="text-muted small">Tracks Fasting (70-99 mg/dL) & Postprandial glucose with Hypoglycemia and Diabetes thresholds.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-circle bg-warning-subtle text-warning"><i class="fa-solid fa-droplet"></i></div>
+                        <div>
+                            <strong class="d-block text-dark">2. Cholesterol Meter</strong>
+                            <span class="text-muted small">Classifies Total Cholesterol into Desirable (&lt;200), Borderline High (200-239), and High Risk (&ge;240 mg/dL).</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-circle bg-success-subtle text-success"><i class="fa-solid fa-weight-scale"></i></div>
+                        <div>
+                            <strong class="d-block text-dark">3. Overweight / Underweight Meter</strong>
+                            <span class="text-muted small">Dynamic BMI Gauge calculating Underweight (&lt;18.5), Normal (18.5-24.9), Overweight, and Obese with ideal weight range.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-circle bg-danger-subtle text-danger"><i class="fa-solid fa-heart-pulse"></i></div>
+                        <div>
+                            <strong class="d-block text-dark">4. Pulse Rate Meter with Live Pulsating Animation</strong>
+                            <span class="text-muted small">Animated heartbeat visualizer beating at exact measured BPM, detecting Bradycardia (&lt;60) and Tachycardia (&gt;100).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'health_meters' %}" class="btn btn-primary rounded-pill px-4 fw-bold">
+                    <i class="fa-solid fa-gauge-high me-2"></i> Launch Interactive Health Meters
+                </a>
+            </div>
+
+            <div class="col-lg-6">
+                <!-- Mini Preview Box -->
+                <div class="card-cp p-4 border-2 shadow-sm text-center">
+                    <div class="pulse-heart-icon mb-2">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1">Live Vitals Simulator</h5>
+                    <p class="text-muted small mb-4">Try interactive sliders & real-time needle deflection</p>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-start">
+                                <span class="badge bg-success-subtle text-success mb-1">Sugar Meter</span>
+                                <div class="fw-bold fs-5 text-dark">94.0 <span class="small text-muted">mg/dL</span></div>
+                                <span class="small text-success fw-bold"><i class="fa-solid fa-check me-1"></i>Normal</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-start">
+                                <span class="badge bg-warning-subtle text-warning mb-1">Cholesterol</span>
+                                <div class="fw-bold fs-5 text-dark">185 <span class="small text-muted">mg/dL</span></div>
+                                <span class="small text-success fw-bold"><i class="fa-solid fa-check me-1"></i>Desirable</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-start">
+                                <span class="badge bg-info-subtle text-info mb-1">BMI Meter</span>
+                                <div class="fw-bold fs-5 text-dark">23.7 <span class="small text-muted">kg/m²</span></div>
+                                <span class="small text-success fw-bold"><i class="fa-solid fa-check me-1"></i>Healthy Weight</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3 text-start">
+                                <span class="badge bg-danger-subtle text-danger mb-1">Pulse Rate</span>
+                                <div class="fw-bold fs-5 text-dark">72 <span class="small text-muted">BPM</span></div>
+                                <span class="small text-success fw-bold"><i class="fa-solid fa-check me-1"></i>Normal Rhythm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'health_meters' %}" class="btn btn-outline-primary btn-sm rounded-pill mt-4 w-100 fw-bold">
+                        Open Full Meters Dashboard <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Requirement 1 & 2: Hospital List & Specialties -->
+<section class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+            <div>
+                <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">Hospital Network</span>
+                <h2 class="fw-bold mb-1">Explore Hospitals & Clinical Departments</h2>
+                <p class="text-muted mb-0">Browse accredited multi-specialty hospitals with individual department heads and cabin facilities.</p>
+            </div>
+            <a href="{% url 'hospital_list' %}" class="btn btn-outline-primary rounded-pill fw-semibold">
+                View All Hospitals <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for hosp in hospitals %}
+            <div class="col-lg-6">
+                <div class="card-cp h-100 overflow-hidden d-flex flex-column">
+                    <div class="row g-0 flex-grow-1">
+                        <div class="col-sm-5 position-relative">
+                            {% if hosp.image_url %}
+                            <img src="{{ hosp.image_url }}" alt="{{ hosp.name }}" class="h-100 w-100 object-fit-cover" style="min-height: 200px;">
+                            {% else %}
+                            <div class="h-100 w-100 bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary">
+                                <i class="fa-solid fa-hospital fa-3x"></i>
+                            </div>
+                            {% endif %}
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-dark text-white rounded-pill">
+                                <i class="fa-solid fa-star text-warning me-1"></i> {{ hosp.rating }}
+                            </span>
+                        </div>
+                        <div class="col-sm-7 p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-1">
+                                    <a href="{% url 'hospital_detail' hosp.slug %}" class="text-dark text-decoration-none hover-primary">
+                                        {{ hosp.name }}
+                                    </a>
+                                </h5>
+                                <div class="text-muted small mb-2">
+                                    <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ hosp.city }} &bull; {{ hosp.total_beds }} Beds
+                                </div>
+                                <p class="text-muted small mb-3 line-clamp-2">
+                                    {{ hosp.description|truncatewords:15 }}
+                                </p>
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    {% for dept in hosp.departments.all|slice:":4" %}
+                                    <span class="badge bg-light text-dark border small">
+                                        <i class="fa-solid {{ dept.specialty.icon }} text-primary me-1"></i> {{ dept.specialty.name }}
+                                    </span>
+                                    {% endfor %}
+                                    {% if hosp.departments.count > 4 %}
+                                    <span class="badge bg-light text-muted border small">+{{ hosp.departments.count|add:"-4" }} more</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'hospital_detail' hosp.slug %}" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold flex-grow-1">
+                                    Departments & Doctors
+                                </a>
+                                <a href="{% url 'book_appointment' %}?hospital={{ hosp.id }}" class="btn btn-primary btn-sm rounded-pill fw-semibold px-3">
+                                    Book 15m
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Symptom Checker CTA -->
+<section class="py-5 bg-primary text-white">
+    <div class="container py-3 text-center">
+        <div class="d-inline-flex p-3 rounded-circle bg-white text-primary mb-3">
+            <i class="fa-solid fa-stethoscope fa-2x"></i>
+        </div>
+        <h2 class="fw-bold mb-2">Feeling Unwell? Check Symptoms with Clinical Triage</h2>
+        <p class="lead opacity-90 mx-auto mb-4" style="max-width: 650px;">
+            Input your symptoms to evaluate risk levels, detect potential red flag emergencies, and get directly matched with the right medical specialist.
+        </p>
+        <a href="{% url 'symptom_checker' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">
+            Start Free Symptom Check <i class="fa-solid fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+</section>
+{% endblock %}

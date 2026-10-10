@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor Portal - Dr. {{ doctor.user.get_full_name|default:doctor.user.username }} | CarePoint{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <!-- Doctor Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-4 bg-teal-subtle text-secondary p-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 52px; height: 52px; background: #ccfbf1; color: #0f766e;">
+                <i class="fa-solid fa-user-doctor fa-xl"></i>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h2 class="fw-bold mb-0 text-dark">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h2>
+                    <span class="badge bg-secondary text-white rounded-pill px-3 py-1">{{ doctor.specialty.name }}</span>
+                </div>
+                <span class="text-muted small">
+                    <i class="fa-solid fa-hospital text-primary me-1"></i> {{ doctor.hospital.name }} &bull; 
+                    <i class="fa-solid fa-door-open text-secondary ms-2 me-1"></i> Cabin: <strong>{{ doctor.cabin_number }}</strong> &bull;
+                    <i class="fa-solid fa-clock text-success ms-2 me-1"></i> <strong>15-Minute Consultation Blocks</strong>
+                </span>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <!-- Date Filter -->
+            <form method="get" class="d-flex align-items-center gap-2">
+                <input type="date" name="date" class="form-control form-control-sm" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+            </form>
+            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#doctorEmergencySwapModal">
+                <i class="fa-solid fa-arrows-rotate me-1"></i> Emergency Slot Swap
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Token Queue Controller (Requirement 6) -->
+    <div class="row g-4 mb-4">
+        <!-- Currently Serving Token Card -->
+        <div class="col-lg-6">
+            <div class="card-cp p-4 h-100 border-primary border-2 shadow-sm d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary text-white px-3 py-2 rounded-pill fw-bold">
+                            <i class="fa-solid fa-door-open me-1"></i> CURRENT IN CABIN
+                        </span>
+                        <span class="text-muted small">Date: {{ selected_date|date:"M d, Y" }}</span>
+                    </div>
+
+                    {% if active_appt %}
+                    <div class="d-flex align-items-center gap-4 mb-4">
+                        <div class="token-big-badge py-2 px-3">
+                            <div class="small fw-bold">TOKEN</div>
+                            <div class="fs-1 fw-bold">#{{ active_appt.token_number }}</div>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-1 text-dark">{{ active_appt.patient_name }}</h4>
+                            <div class="text-muted small mb-1">
+                                {{ active_appt.patient_age }}y &bull; {{ active_appt.get_patient_gender_display }} &bull; {{ active_appt.patient_phone }}
+                            </div>
+                            <span class="badge bg-success-subtle text-success">
+                                <i class="fa-solid fa-clock me-1"></i> {{ active_appt.duration_display }}
+                            </span>
+                            {% if active_appt.is_emergency %}
+                            <span class="badge bg-danger text-white ms-1">
+                                <i class="fa-solid fa-truck-medical me-1"></i> Emergency Priority
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border small mb-3">
+                        <strong class="d-block text-dark mb-1">Symptoms / Triage Notes:</strong>
+                        <span class="text-muted">{{ active_appt.symptoms_summary|default:'Routine clinical consultation' }}</span>
+                    </div>
+
+                    <!-- Consultation Action Form -->
+                    <form method="post" action="{% url 'update_appointment_status' active_appt.id %}">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <input type="text" name="doctor_notes" class="form-control form-control-sm" placeholder="Clinical notes / Diagnosis...">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" name="prescription" class="form-control form-control-sm" placeholder="Prescription / Rx...">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input type="hidden" name="status" value="COMPLETED">
+                            <button type="submit" class="btn btn-success rounded-pill fw-bold btn-sm flex-grow-1">
+                                <i class="fa-solid fa-circle-check me-1"></i> Mark Consultation Completed
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-user-clock fa-3x mb-3 text-secondary opacity-50"></i>
+                        <h5>No Patient Currently in Cabin</h5>
+                        <p class="small mb-0">Call the next waiting patient from the queue below.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Token in Queue Desk -->
+        <div class="col-lg-6">
+            <div class="card-cp p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fw-bold">
+                            <i class="fa-solid fa-users me-1"></i> NEXT IN WAITING QUEUE
+                        </span>
+                        <span class="text-muted small">Queue Length: {{ appointments.count }}</span>
+                    </div>
+
+                    {% if next_appt %}
+                    <div class="d-flex align-items-center gap-4 mb-4">
+                        <div class="p-3 rounded-4 bg-light border text-center" style="min-width: 90px;">
+                            <div class="small text-muted fw-bold">TOKEN</div>
+                            <div class="fs-2 fw-bold text-primary">#{{ next_appt.token_number }}</div>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-1 text-dark">{{ next_appt.patient_name }}</h4>
+                            <div class="text-muted small mb-1">
+                                {{ next_appt.patient_age }}y &bull; {{ next_appt.get_patient_gender_display }} &bull; {{ next_appt.patient_phone }}
+                            </div>
+                            <span class="badge bg-light text-dark border">
+                                <i class="fa-solid fa-clock text-primary me-1"></i> Slot: {{ next_appt.duration_display }}
+                            </span>
+                            {% if next_appt.is_emergency %}
+                            <span class="badge bg-danger text-white ms-1">
+                                <i class="fa-solid fa-truck-medical me-1"></i> EMERGENCY CASE
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border small mb-3">
+                        <strong class="d-block text-dark mb-1">Reported Symptoms:</strong>
+                        <span class="text-muted">{{ next_appt.symptoms_summary|default:'Routine follow-up' }}</span>
+                    </div>
+
+                    <form method="post" action="{% url 'update_appointment_status' next_appt.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="IN_CONSULTATION">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold w-100 py-2 shadow-sm">
+                            <i class="fa-solid fa-bell me-2"></i> Call Token #{{ next_appt.token_number }} to Cabin
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-circle-check fa-3x mb-3 text-success opacity-50"></i>
+                        <h5>All Scheduled Patients Have Been Served!</h5>
+                        <p class="small mb-0">No further waiting tokens in the queue for {{ selected_date|date:"M d" }}.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 15-Minute Slot Timetable for Selected Date (Requirement 3 & 4) -->
+    <div class="card-cp overflow-hidden mb-4">
+        <div class="card-cp-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-timeline text-primary me-2"></i>15-Minute Slot Timetable ({{ selected_date|date:"l, F d, Y" }})</h5>
+                <span class="text-muted small">Strict 15-minute consultations &bull; Booked slots locked against double-booking</span>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-check me-1"></i> Open (15m)</span>
+                <span class="badge bg-secondary-subtle text-muted border px-2 py-1"><i class="fa-solid fa-lock me-1"></i> Booked</span>
+            </div>
+        </div>
+
+        <div class="card-cp-body">
+            <div class="slot-grid">
+                {% for slot in slots %}
+                <div class="slot-pill {% if slot.is_booked %}booked{% endif %}">
+                    <div class="fw-bold">{{ slot.time }}</div>
+                    {% if slot.is_booked %}
+                    <span class="slot-badge slot-badge-booked">
+                        Token #{{ slot.token_number }} ({{ slot.patient_name|truncatechars:10 }})
+                    </span>
+                    {% else %}
+                    <span class="slot-badge slot-badge-avail"><i class="fa-solid fa-check me-1"></i>Available</span>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-4 text-muted">No slots configured.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Vitals & Health Meters Inspector (Requirement 7) -->
+    <div class="card-cp overflow-hidden">
+        <div class="card-cp-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-gauge-high text-info me-2"></i>Patient Health Vitals & Meters Registry</h5>
+            <span class="badge bg-info text-white">Clinical Vitals Review</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+                <thead class="table-light">
+                    <tr>
+                        <th>Patient</th>
+                        <th>Recorded Date</th>
+                        <th>Sugar Fasting</th>
+                        <th>Total Cholesterol</th>
+                        <th>BMI (Weight/Height)</th>
+                        <th>Pulse Rate</th>
+                        <th>Doctor Clinical Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in recent_patient_vitals %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ v.patient.get_full_name|default:v.patient.username }}</td>
+                        <td class="text-muted">{{ v.recorded_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if v.sugar_fasting %}
+                            <strong>{{ v.sugar_fasting }} mg/dL</strong>
+                            <span class="badge {% if 'Normal' in v.sugar_status %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} ms-1">{{ v.sugar_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            {% if v.cholesterol_total %}
+                            <strong>{{ v.cholesterol_total }} mg/dL</strong>
+                            <span class="badge {% if 'Desirable' in v.cholesterol_status %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} ms-1">{{ v.cholesterol_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            {% if v.bmi %}
+                            <strong>{{ v.bmi }}</strong> ({{ v.weight_kg }}kg / {{ v.height_cm }}cm)
+                            <span class="badge {% if 'Normal' in v.weight_status %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} ms-1">{{ v.weight_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            {% if v.pulse_rate %}
+                            <strong>{{ v.pulse_rate }} BPM</strong>
+                            <span class="badge bg-light text-dark border ms-1">{{ v.pulse_status }}</span>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'health_meters' %}" class="btn btn-outline-info btn-sm rounded-pill py-0 px-2">Inspect Meters</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No recent patient vitals logged for this clinic.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Doctor Emergency Swap Modal (Requirement 5) -->
+<div class="modal fade" id="doctorEmergencySwapModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger rounded-4">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-arrows-rotate me-2"></i>Doctor Emergency Priority Swap</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'emergency_swap' %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">
+                        Execute immediate clinical preemption. Select a scheduled slot to displace for an acute emergency patient.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Slot to Preempt <span class="text-danger">*</span></label>
+                        <select name="target_appointment_id" class="form-select" required>
+                            <option value="">-- Choose Scheduled Slot --</option>
+                            {% for appt in appointments %}
+                            {% if appt.status != 'COMPLETED' and not appt.is_emergency %}
+                            <option value="{{ appt.id }}">
+                                Token #{{ appt.token_number }} ({{ appt.time_slot|time:"H:i" }}) - {{ appt.patient_name }}
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Emergency Patient Name <span class="text-danger">*</span></label>
+                        <input type="text" name="emergency_patient_name" class="form-control" placeholder="Acute Emergency Arrival" required>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-8">
+                            <label class="form-label small fw-bold text-dark">Phone Number</label>
+                            <input type="tel" name="emergency_patient_phone" class="form-control" placeholder="+1 (555) 911-3322" required>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small fw-bold text-dark">Age</label>
+                            <input type="number" name="emergency_patient_age" class="form-control" value="50">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Physician Justification</label>
+                        <textarea name="reason" class="form-control" rows="2" placeholder="Acute angina pectoris / urgent clinical necessity." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger rounded-pill fw-bold btn-sm px-4">Swap to Emergency</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

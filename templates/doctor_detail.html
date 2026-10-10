@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dr. {{ doctor.user.get_full_name|default:doctor.user.username }} - Schedule | CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'hospital_list' %}">Hospitals</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'hospital_detail' doctor.hospital.slug %}">{{ doctor.hospital.name }}</a></li>
+            <li class="breadcrumb-item active">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Doctor Profile Card -->
+        <div class="col-lg-4">
+            <div class="card-cp p-4 sticky-top" style="top: 100px;">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle bg-primary-subtle text-primary p-3 d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1 text-dark">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h4>
+                    <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">{{ doctor.specialty.name }}</span>
+                    <div class="text-muted small">{{ doctor.qualification }}</div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 border-top border-bottom py-3 mb-3 small">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-hospital me-1 text-primary"></i> Hospital:</span>
+                        <strong class="text-dark">{{ doctor.hospital.name }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-door-open me-1 text-secondary"></i> Cabin:</span>
+                        <strong class="text-dark">{{ doctor.cabin_number }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-clock me-1 text-info"></i> Slot Duration:</span>
+                        <strong class="text-success">{{ doctor.slot_duration_minutes }} Minutes</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-business-time me-1 text-warning"></i> Experience:</span>
+                        <strong class="text-dark">{{ doctor.experience_years }} Years</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-tag me-1 text-success"></i> Consultation Fee:</span>
+                        <strong class="text-dark fs-6">${{ doctor.consultation_fee }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-calendar-day me-1 text-muted"></i> Hours:</span>
+                        <strong class="text-dark">{{ doctor.start_time|time:"H:i" }} - {{ doctor.end_time|time:"H:i" }}</strong>
+                    </div>
+                </div>
+
+                <p class="text-muted small mb-4">{{ doctor.bio }}</p>
+
+                <a href="{% url 'book_appointment' %}?doctor={{ doctor.id }}" class="btn btn-primary rounded-pill w-100 fw-bold py-2">
+                    <i class="fa-solid fa-calendar-plus me-1"></i> Book 15-Minute Slot
+                </a>
+            </div>
+        </div>
+
+        <!-- Today's 15-Minute Schedule -->
+        <div class="col-lg-8">
+            <div class="card-cp p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div>
+                        <h4 class="fw-bold mb-1">Today's 15-Minute Slot Schedule</h4>
+                        <p class="text-muted small mb-0">{{ today|date:"l, F d, Y" }} &bull; 15-minute consultations</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-check me-1"></i> Available</span>
+                        <span class="badge bg-secondary-subtle text-muted border px-2 py-1"><i class="fa-solid fa-lock me-1"></i> Booked</span>
+                    </div>
+                </div>
+
+                <div class="slot-grid mt-4">
+                    {% for slot in slots %}
+                    <div class="slot-pill {% if slot.is_booked %}booked{% endif %}">
+                        <div>{{ slot.time }}</div>
+                        {% if slot.is_booked %}
+                        <span class="slot-badge slot-badge-booked"><i class="fa-solid fa-lock me-1"></i>Booked (Token #{{ slot.token_number }})</span>
+                        {% else %}
+                        <span class="slot-badge slot-badge-avail"><i class="fa-solid fa-check me-1"></i>15 Mins</span>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-4 text-muted">No slots generated.</div>
+                    {% endfor %}
+                </div>
+
+                <div class="alert alert-info mt-4 mb-0 small">
+                    <i class="fa-solid fa-circle-info me-1"></i>
+                    Slots marked with <strong>Booked</strong> cannot be booked for routine visits (preventing double-booking). If this is a critical emergency, visit the Hospital Desk or request an Emergency Priority Swap.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

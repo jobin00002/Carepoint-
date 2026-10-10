@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book 15-Minute Appointment - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">15-Minute Clinical Slot</span>
+                <h2 class="fw-bold mb-1">Book Healthcare Appointment</h2>
+                <p class="text-muted mx-auto" style="max-width: 650px;">
+                    Select your specialist physician, choose an available 15-minute consultation block, and receive your digital patient token immediately.
+                </p>
+            </div>
+
+            <div class="card-cp overflow-hidden">
+                <div class="card-cp-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-primary fa-lg"></i>
+                        <span class="fw-bold text-dark">Appointment & Token Registration Form</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                        <i class="fa-solid fa-clock me-1"></i> Strict 15-Minute Scheduling
+                    </span>
+                </div>
+
+                <div class="card-cp-body p-4 p-md-5">
+                    <form method="post" id="appointmentBookingForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="time_slot" id="selected_time_slot" required>
+
+                        <!-- Step 1: Doctor & Date Selection -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-7">
+                                <label class="form-label fw-bold text-dark"><i class="fa-solid fa-user-doctor text-primary me-1"></i> Select Doctor & Department <span class="text-danger">*</span></label>
+                                <select name="doctor" id="doctor_select" class="form-select form-select-lg" required>
+                                    <option value="">-- Choose Specialist Doctor --</option>
+                                    {% for doc in doctors %}
+                                    <option value="{{ doc.id }}" {% if selected_doctor and selected_doctor.id == doc.id %}selected{% endif %}>
+                                        Dr. {{ doc.user.get_full_name|default:doc.user.username }} &bull; {{ doc.specialty.name }} ({{ doc.hospital.name }}) - ${{ doc.consultation_fee }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Choose from our accredited hospital specialists.</div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold text-dark"><i class="fa-solid fa-calendar-day text-secondary me-1"></i> Appointment Date <span class="text-danger">*</span></label>
+                                <input type="date" name="appointment_date" id="appointment_date_input" class="form-control form-select-lg" value="{{ today_str }}" min="{{ today_str }}" required>
+                                <div class="form-text">Consultations available 09:00 - 17:00.</div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: 15-Minute Slot Selector (Requirement 3 & 4) -->
+                        <div class="p-4 rounded-4 bg-light border mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                <div>
+                                    <h5 class="fw-bold mb-0 text-dark">
+                                        <i class="fa-solid fa-grid text-primary me-2"></i>Select 15-Minute Time Slot
+                                    </h5>
+                                    <span class="text-muted small">Greyed-out slots are already booked (Double-booking strictly avoided).</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-check me-1"></i> Available</span>
+                                    <span class="badge bg-secondary-subtle text-muted border px-2 py-1"><i class="fa-solid fa-lock me-1"></i> Already Booked</span>
+                                </div>
+                            </div>
+
+                            <!-- Slots grid populated via AJAX -->
+                            <div id="slots_container" class="my-3">
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fa-solid fa-hand-pointer fa-2x mb-2 text-primary opacity-50"></i>
+                                    <p class="mb-0">Please choose a doctor and date above to load available 15-minute slots.</p>
+                                </div>
+                            </div>
+
+                            <div id="selected_slot_summary" class="mt-2"></div>
+                        </div>
+
+                        <!-- Step 3: Patient Information -->
+                        <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-id-card text-info me-2"></i>Patient Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Patient Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="patient_name" class="form-control" value="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% endif %}" placeholder="e.g. John Doe" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" name="patient_phone" class="form-control" value="{% if user_profile %}{{ user_profile.phone }}{% endif %}" placeholder="e.g. +1 (555) 019-2834" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Age <span class="text-danger">*</span></label>
+                                <input type="number" name="patient_age" class="form-control" value="32" min="1" max="120" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
+                                <select name="patient_gender" class="form-select">
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Token Pass Type</label>
+                                <input type="text" class="form-control" value="Standard Digital Token" readonly disabled>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Symptoms / Reason for Consultation</label>
+                                <textarea name="symptoms" class="form-control" rows="2" placeholder="Briefly describe your health condition or symptoms..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Emergency Case & Swap Protocol (Requirement 5) -->
+                        <div class="p-3 rounded-4 bg-danger-subtle border border-danger-subtle mb-4">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="is_emergency" value="1" id="is_emergency_checkbox">
+                                <label class="form-check-label fw-bold text-danger fs-6" for="is_emergency_checkbox">
+                                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Mark as Critical Emergency Case (Enable Emergency Swap)
+                                </label>
+                            </div>
+                            <p class="small text-danger-emphasis mb-0">
+                                When checked, our clinical emergency triage engine allows this urgent booking to pre-emptively swap into a booked slot. The displaced patient will be automatically rescheduled to the next available 15-minute slot.
+                            </p>
+
+                            <div id="emergency_swap_alert" class="d-none mt-3 pt-3 border-top border-danger-subtle">
+                                <label class="form-label fw-bold text-danger small">Emergency Severity Level:</label>
+                                <select name="emergency_severity" class="form-select form-select-sm mb-2" style="max-width: 300px;">
+                                    <option value="CRITICAL_EMERGENCY">Critical Emergency (Immediate Triage)</option>
+                                    <option value="HIGH">High Severity (Urgent 15-min preemption)</option>
+                                    <option value="MODERATE">Moderate Urgent</option>
+                                </select>
+                                <span class="badge bg-danger text-white p-2">
+                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Emergency Swap will be logged in hospital audit registry
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow">
+                                <i class="fa-solid fa-ticket me-2"></i> Confirm 15-Min Booking & Generate Patient Token
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/appointment_slots.js' %}"></script>
+{% endblock %}

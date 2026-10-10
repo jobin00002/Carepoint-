@@ -1,0 +1,62 @@
+<footer class="bg-white border-top py-5 mt-5 no-print">
+    <div class="container">
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="brand-logo mb-3">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 p-2 me-1" style="width: 32px; height: 32px;">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </span>
+                    <span>Care<span class="text-secondary">Point</span></span>
+                </div>
+                <p class="text-muted small">
+                    Smart Hospital Appointment & Clinical Triage System with 15-Minute Slot scheduling, Emergency Preemption Swaps, Digital Patient Tokens, and interactive Health Vital Meters.
+                </p>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle p-2">
+                        <i class="fa-solid fa-phone-flip me-1"></i> Helpline: +1 (800) 911-CARE
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h6 class="fw-bold text-dark mb-3">Core Features</h6>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2">
+                    <li><a href="{% url 'hospital_list' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-angle-right me-1 text-primary"></i> Hospital Directory</a></li>
+                    <li><a href="{% url 'symptom_checker' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-angle-right me-1 text-primary"></i> Symptom Checker</a></li>
+                    <li><a href="{% url 'health_meters' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-angle-right me-1 text-primary"></i> Health Meters Suite</a></li>
+                    <li><a href="{% url 'book_appointment' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-angle-right me-1 text-primary"></i> 15-Min Slot Booking</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold text-dark mb-3">Dedicated Portals</h6>
+                <ul class="list-unstyled small text-muted d-flex flex-column gap-2">
+                    <li><a href="{% url 'admin_portal' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-shield-halved me-1 text-danger"></i> Central Admin Portal</a></li>
+                    <li><a href="{% url 'hospital_portal' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-hospital me-1 text-primary"></i> Hospital Management Portal</a></li>
+                    <li><a href="{% url 'doctor_portal' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-user-doctor me-1 text-secondary"></i> Doctor Timetable & Queue</a></li>
+                    <li><a href="{% url 'patient_portal' %}" class="text-decoration-none text-muted"><i class="fa-solid fa-bed-pulse me-1 text-success"></i> Patient Pass & Records</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="fw-bold text-dark mb-3">Clinical Compliance</h6>
+                <p class="text-muted small mb-2">
+                    <i class="fa-solid fa-clock text-primary me-1"></i> Strict 15-Minute Consultation Blocks
+                </p>
+                <p class="text-muted small mb-2">
+                    <i class="fa-solid fa-ticket text-info me-1"></i> Unique Sequential Patient Token Generation
+                </p>
+                <p class="text-muted small mb-2">
+                    <i class="fa-solid fa-arrows-rotate text-warning me-1"></i> Critical Emergency Priority Swap Protocol
+                </p>
+                <p class="text-muted small">
+                    <i class="fa-solid fa-shield-check text-success me-1"></i> Zero Double-Booking Guarantee
+                </p>
+            </div>
+        </div>
+
+        <div class="border-top pt-4 text-center text-muted small">
+            &copy; 2026 CarePoint Healthcare System. All rights reserved. Designed for multi-hospital networks and emergency clinical triage.
+        </div>
+    </div>
+</footer>

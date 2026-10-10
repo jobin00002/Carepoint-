@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patient Registration - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="text-center mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-4 p-3 mb-3" style="width: 56px; height: 56px;">
+                    <i class="fa-solid fa-user-plus fa-xl"></i>
+                </span>
+                <h3 class="fw-bold mb-1">Create Patient Account</h3>
+                <p class="text-muted small">Register to book 15-minute consultations, track health vitals, and receive instant digital tokens.</p>
+            </div>
+
+            <div class="card-cp p-4 p-md-5 shadow-sm">
+                <form method="post" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">First Name <span class="text-danger">*</span></label>
+                            <input type="text" name="first_name" class="form-control" required placeholder="John">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" name="last_name" class="form-control" required placeholder="Doe">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" required placeholder="john_doe">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" required placeholder="john@example.com">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Phone Number <span class="text-danger">*</span></label>
+                            <input type="tel" name="phone" class="form-control" required placeholder="+1 (555) 019-2834">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Gender</label>
+                            <select name="gender" class="form-select">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="O">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" required placeholder="Create password">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" name="confirm_password" class="form-control" required placeholder="Confirm password">
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">
+                                <i class="fa-solid fa-circle-check me-2"></i> Register & Enter Patient Portal
+                            </button>
+                        </div>
+
+                        <div class="col-12 text-center small text-muted">
+                            Already have an account? <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none">Sign In</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

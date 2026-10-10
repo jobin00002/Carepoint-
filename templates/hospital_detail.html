@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hospital.name }} - Departments & Doctors | CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'hospital_list' %}">Hospitals</a></li>
+            <li class="breadcrumb-item active">{{ hospital.name }}</li>
+        </ol>
+    </nav>
+
+    <!-- Hospital Hero Banner -->
+    <div class="card-cp overflow-hidden mb-5">
+        <div class="row g-0">
+            <div class="col-lg-5 position-relative">
+                {% if hospital.image_url %}
+                <img src="{{ hospital.image_url }}" alt="{{ hospital.name }}" class="w-100 h-100 object-fit-cover" style="min-height: 280px;">
+                {% else %}
+                <div class="w-100 h-100 bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary" style="min-height: 280px;">
+                    <i class="fa-solid fa-hospital fa-4x"></i>
+                </div>
+                {% endif %}
+                <span class="position-absolute top-0 start-0 m-3 badge bg-dark text-white rounded-pill px-3 py-2">
+                    <i class="fa-solid fa-star text-warning me-1"></i> {{ hospital.rating }} / 5.0 Rating
+                </span>
+            </div>
+
+            <div class="col-lg-7 p-4 p-md-5 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                        <h2 class="fw-bold mb-0 text-dark">{{ hospital.name }}</h2>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill fw-bold">
+                            <i class="fa-solid fa-phone-volume me-1"></i> 24/7 ER: {{ hospital.emergency_helpline }}
+                        </span>
+                    </div>
+
+                    <div class="text-muted mb-3">
+                        <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ hospital.address }}, {{ hospital.city }}
+                        &bull; <i class="fa-solid fa-phone text-primary ms-2 me-1"></i> {{ hospital.phone }}
+                    </div>
+
+                    <p class="text-muted mb-4">{{ hospital.description }}</p>
+
+                    <!-- Capacity Badges -->
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <div class="p-2 px-3 rounded-3 bg-light border text-center">
+                            <div class="fw-bold text-primary fs-5">{{ hospital.total_beds }}</div>
+                            <div class="small text-muted">Total Beds</div>
+                        </div>
+                        <div class="p-2 px-3 rounded-3 bg-light border text-center">
+                            <div class="fw-bold text-danger fs-5">{{ hospital.available_icu_beds }}</div>
+                            <div class="small text-muted">ICU Beds</div>
+                        </div>
+                        <div class="p-2 px-3 rounded-3 bg-light border text-center">
+                            <div class="fw-bold text-secondary fs-5">{{ departments.count }}</div>
+                            <div class="small text-muted">Departments</div>
+                        </div>
+                        <div class="p-2 px-3 rounded-3 bg-light border text-center">
+                            <div class="fw-bold text-success fs-5">{{ total_doctors }}</div>
+                            <div class="small text-muted">Doctors Available</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{% url 'book_appointment' %}?hospital={{ hospital.id }}" class="btn btn-primary rounded-pill px-4 fw-bold">
+                        <i class="fa-solid fa-calendar-check me-1"></i> Book Appointment at this Hospital
+                    </a>
+                    <a href="tel:{{ hospital.emergency_helpline }}" class="btn btn-outline-danger rounded-pill px-4 fw-bold">
+                        <i class="fa-solid fa-truck-medical me-1"></i> Call Emergency
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requirement 2: Individual Department and Doctor for Each Hospital -->
+    <div class="mb-4">
+        <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">Requirement 2</span>
+        <h3 class="fw-bold mb-1">Clinical Departments & Specialist Doctors</h3>
+        <p class="text-muted">Explore individual hospital departments with dedicated cabin suites and scheduled 15-minute consultations.</p>
+    </div>
+
+    <div class="row g-4">
+        {% for dept, doc_list in dept_doctors_map.items %}
+        <div class="col-12">
+            <div class="card-cp overflow-hidden">
+                <!-- Department Header -->
+                <div class="card-cp-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary-subtle text-primary p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <i class="fa-solid {{ dept.specialty.icon }} fa-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0 text-dark">{{ dept.specialty.name }} Department</h4>
+                            <div class="text-muted small">
+                                <i class="fa-solid fa-layer-group me-1"></i> {{ dept.floor }} &bull; 
+                                <i class="fa-solid fa-door-open ms-2 me-1"></i> {{ dept.opd_rooms }} &bull;
+                                <i class="fa-solid fa-user-tie ms-2 me-1"></i> HOD: {{ dept.head_of_department|default:'Senior Consultant' }}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold">
+                        {{ doc_list.count }} Doctor{{ doc_list.count|pluralize }}
+                    </span>
+                </div>
+
+                <!-- Doctors in this department -->
+                <div class="card-cp-body">
+                    {% if doc_list %}
+                    <div class="row g-3">
+                        {% for doc in doc_list %}
+                        <div class="col-lg-6">
+                            <div class="p-3 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-circle bg-secondary-subtle text-secondary p-2 d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                                <i class="fa-solid fa-user-doctor"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="fw-bold mb-0 text-dark">
+                                                    Dr. {{ doc.user.get_full_name|default:doc.user.username }}
+                                                </h5>
+                                                <span class="text-muted small">{{ doc.qualification }}</span>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 small">
+                                            <i class="fa-solid fa-clock me-1"></i> 15m Slots
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted small mb-3">
+                                        {{ doc.bio|truncatewords:20 }}
+                                    </p>
+
+                                    <!-- Doctor Metadata -->
+                                    <div class="d-flex flex-wrap gap-2 mb-3 small">
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fa-solid fa-door-closed text-primary me-1"></i> Cabin: {{ doc.cabin_number }}
+                                        </span>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fa-solid fa-business-time text-secondary me-1"></i> {{ doc.experience_years }} Yrs Exp
+                                        </span>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fa-solid fa-tag text-success me-1"></i> Fee: ${{ doc.consultation_fee }}
+                                        </span>
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fa-solid fa-calendar-day text-info me-1"></i> {{ doc.start_time|time:"H:i" }} - {{ doc.end_time|time:"H:i" }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2 pt-2 border-top">
+                                    <a href="{% url 'doctor_detail' doc.id %}" class="btn btn-outline-secondary btn-sm rounded-pill flex-grow-1 fw-semibold">
+                                        View Schedule
+                                    </a>
+                                    <a href="{% url 'book_appointment' %}?doctor={{ doc.id }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
+                                        <i class="fa-solid fa-calendar-plus me-1"></i> Book 15-Min Slot
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-user-slash fa-2x mb-2 opacity-50"></i>
+                        <p class="mb-0">No active doctors currently assigned to this department.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">No departments configured for this hospital yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Central Admin Sign In - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="text-center mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center bg-danger text-white rounded-4 p-3 mb-3 shadow" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-shield-halved fa-2x"></i>
+                </span>
+                <h3 class="fw-bold mb-1 text-dark">Central Admin Sign In</h3>
+                <p class="text-muted small">Restricted to authorized system administrators and compliance supervisors.</p>
+            </div>
+
+            <!-- Admin Sign In Form -->
+            <div class="card-cp p-4 p-md-5 border-danger border-1 shadow-sm">
+                <form method="post" action="{% url 'admin_login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small">Administrator Username <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-user-shield"></i></span>
+                            <input type="text" name="username" class="form-control border-start-0" placeholder="e.g. admin" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark small">Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-key"></i></span>
+                            <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2 shadow-sm mb-3">
+                        <i class="fa-solid fa-lock-open me-2"></i> Access Admin Portal
+                    </button>
+
+                    <div class="text-center small text-muted pt-2 border-top">
+                        <a href="{% url 'portal_select' %}" class="text-secondary text-decoration-none">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Return to Portal Selector
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

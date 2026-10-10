@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register Hospital - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-4 p-3 mb-3 shadow" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-hospital-user fa-2x"></i>
+                </span>
+                <h3 class="fw-bold mb-1 text-dark">Register New Hospital & Administration</h3>
+                <p class="text-muted small">Join CarePoint's integrated network of accredited hospitals and OPD clinical departments.</p>
+            </div>
+
+            <div class="card-cp p-4 p-md-5 border-primary border-1 shadow-sm">
+                <form method="post" action="{% url 'hospital_register' %}">
+                    {% csrf_token %}
+
+                    <!-- Section 1: Hospital Details -->
+                    <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-hospital me-2"></i>Hospital Facility Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-dark">Hospital Official Name <span class="text-danger">*</span></label>
+                            <input type="text" name="hospital_name" class="form-control" placeholder="e.g. St. Luke Medical Center" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">City <span class="text-danger">*</span></label>
+                            <input type="text" name="city" class="form-control" placeholder="e.g. Boston" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Full Physical Address <span class="text-danger">*</span></label>
+                            <input type="text" name="address" class="form-control" placeholder="e.g. 500 Medical Center Dr, Boston, MA" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">General Desk Phone <span class="text-danger">*</span></label>
+                            <input type="tel" name="hospital_phone" class="form-control" placeholder="+1 (555) 012-3456" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-danger">24/7 Emergency Helpline <span class="text-danger">*</span></label>
+                            <input type="tel" name="emergency_helpline" class="form-control border-danger" placeholder="+1 (555) 911-0000" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Total Bed Capacity</label>
+                            <input type="number" name="total_beds" class="form-control" value="150" min="10">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Available ICU Beds</label>
+                            <input type="number" name="available_icu_beds" class="form-control" value="15" min="1">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Hospital Overview / Facilities</label>
+                            <textarea name="description" class="form-control" rows="2" placeholder="Briefly describe clinical focus, trauma level, and specialties..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Hospital Administrator Credentials -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-shield text-secondary me-2"></i>Hospital Administrator Account</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Admin First Name <span class="text-danger">*</span></label>
+                            <input type="text" name="first_name" class="form-control" placeholder="First Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Admin Last Name <span class="text-danger">*</span></label>
+                            <input type="text" name="last_name" class="form-control" placeholder="Last Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Admin Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" placeholder="Username for login" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Official Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="admin@hospital.org" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-dark">Admin Direct Phone</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+1 (555) 234-5678">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" required placeholder="Create password">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-dark">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" name="confirm_password" class="form-control" required placeholder="Re-enter password">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-3 shadow mb-3">
+                        <i class="fa-solid fa-building-circle-check me-2"></i> Register Hospital & Open Portal
+                    </button>
+
+                    <div class="text-center small text-muted">
+                        Already have an administrator account? <a href="{% url 'hospital_login' %}" class="text-primary fw-bold text-decoration-none">Sign In to Hospital Portal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

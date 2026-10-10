@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospitals & Specialties - CarePoint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="mb-4">
+        <span class="badge bg-primary text-white rounded-pill px-3 py-1 mb-2">Requirement 1</span>
+        <h2 class="fw-bold mb-1">Accredited Hospitals & Specialties</h2>
+        <p class="text-muted">Browse partner hospitals with multi-specialty departments, ICU capacities, and immediate 15-minute appointment scheduling.</p>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="card-cp p-4 mb-5">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-lg-5 col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" name="q" class="form-control border-start-0" placeholder="Search hospital name or keywords..." value="{{ search_query }}">
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-3">
+                <select name="city" class="form-select">
+                    <option value="">All Cities</option>
+                    {% for c in cities %}
+                    <option value="{{ c }}" {% if city_filter == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-3">
+                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold">
+                    <i class="fa-solid fa-filter me-1"></i> Filter
+                </button>
+            </div>
+
+            <div class="col-lg-2 col-md-12 text-lg-end">
+                {% if search_query or selected_specialty or city_filter %}
+                <a href="{% url 'hospital_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill">Reset</a>
+                {% endif %}
+            </div>
+
+            <!-- Specialty Badges Row -->
+            <div class="col-12 pt-2 border-top">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="small fw-bold text-muted me-2"><i class="fa-solid fa-stethoscope text-primary me-1"></i> Specialties:</span>
+                    <a href="{% url 'hospital_list' %}" class="badge text-decoration-none {% if not selected_specialty %}bg-primary text-white{% else %}bg-light text-dark border{% endif %} rounded-pill px-3 py-2">
+                        All Specialties
+                    </a>
+                    {% for spec in specialties %}
+                    <a href="?specialty={{ spec.code }}{% if search_query %}&q={{ search_query }}{% endif %}{% if city_filter %}&city={{ city_filter }}{% endif %}"
+                       class="badge text-decoration-none {% if selected_specialty == spec.code %}bg-primary text-white{% else %}bg-light text-dark border{% endif %} rounded-pill px-3 py-2">
+                        <i class="fa-solid {{ spec.icon }} me-1"></i> {{ spec.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Hospital Grid -->
+    <div class="row g-4">
+        {% for hosp in hospitals %}
+        <div class="col-lg-6">
+            <div class="card-cp h-100 overflow-hidden d-flex flex-column">
+                <div class="position-relative">
+                    {% if hosp.image_url %}
+                    <img src="{{ hosp.image_url }}" alt="{{ hosp.name }}" class="w-100 object-fit-cover" style="height: 220px;">
+                    {% else %}
+                    <div class="w-100 bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary" style="height: 220px;">
+                        <i class="fa-solid fa-hospital fa-3x"></i>
+                    </div>
+                    {% endif %}
+                    <span class="position-absolute top-0 start-0 m-3 badge bg-dark text-white rounded-pill px-3 py-2 shadow-sm">
+                        <i class="fa-solid fa-star text-warning me-1"></i> {{ hosp.rating }} Rating
+                    </span>
+                    <span class="position-absolute top-0 end-0 m-3 badge bg-danger text-white rounded-pill px-3 py-2 shadow-sm">
+                        <i class="fa-solid fa-phone-volume me-1"></i> ER: {{ hosp.emergency_helpline }}
+                    </span>
+                </div>
+
+                <div class="card-cp-body flex-grow-1 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h4 class="fw-bold mb-1">
+                                    <a href="{% url 'hospital_detail' hosp.slug %}" class="text-dark text-decoration-none">
+                                        {{ hosp.name }}
+                                    </a>
+                                </h4>
+                                <div class="text-muted small">
+                                    <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ hosp.address }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-muted small mb-3">
+                            {{ hosp.description }}
+                        </p>
+
+                        <!-- Hospital Badges / Capacity -->
+                        <div class="d-flex gap-2 flex-wrap mb-3">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                <i class="fa-solid fa-bed me-1"></i> {{ hosp.total_beds }} Total Beds
+                            </span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                <i class="fa-solid fa-heart-pulse me-1"></i> {{ hosp.available_icu_beds }} ICU Beds
+                            </span>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">
+                                <i class="fa-solid fa-user-doctor me-1"></i> {{ hosp.doctor_count }} Doctors
+                            </span>
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                                <i class="fa-solid fa-building-user me-1"></i> {{ hosp.department_count }} Departments
+                            </span>
+                        </div>
+
+                        <!-- Department Badges -->
+                        <div class="mb-4">
+                            <div class="text-muted small fw-bold mb-1">Clinical Departments:</div>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for dept in hosp.departments.all %}
+                                <span class="badge bg-light text-dark border">
+                                    <i class="fa-solid {{ dept.specialty.icon }} text-primary me-1"></i> {{ dept.specialty.name }}
+                                </span>
+                                {% empty %}
+                                <span class="text-muted small">No departments configured yet.</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <a href="{% url 'hospital_detail' hosp.slug %}" class="btn btn-outline-primary rounded-pill fw-bold flex-grow-1">
+                            <i class="fa-solid fa-stethoscope me-1"></i> View Departments & Doctors
+                        </a>
+                        <a href="{% url 'book_appointment' %}?hospital={{ hosp.id }}" class="btn btn-primary rounded-pill fw-bold px-4">
+                            <i class="fa-solid fa-clock me-1"></i> Book 15m Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="card-cp p-5">
+                <i class="fa-solid fa-hospital-user fa-3x text-muted mb-3"></i>
+                <h4 class="fw-bold">No hospitals found matching your filter</h4>
+                <p class="text-muted">Try removing search keywords or select another medical specialty.</p>
+                <a href="{% url 'hospital_list' %}" class="btn btn-primary rounded-pill px-4">Clear All Filters</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
